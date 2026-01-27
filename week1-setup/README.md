@@ -172,13 +172,19 @@ Congratulations! You've successfully run your first LLM inference with vLLM! �
 | `verify_environment.py` | Environment verification script |
 | `download_model.py` | Model download utility |
 | `baseline_inference.py` | Basic inference test |
+| `experiment_sampling_params.py` | **NEW**: Comprehensive parameter experiments |
+| `test_custom_params.py` | **NEW**: Quick custom parameter testing |
+| `compare_results.py` | **NEW**: Compare experiment results |
 | `requirements.txt` | Python package dependencies |
+| `results/` | Directory for saved experiment results |
 
 ## 🧪 Experiments to Try
 
+### Quick Experiments (Modify baseline_inference.py)
+
 Once the baseline test works, experiment with these modifications to `baseline_inference.py`:
 
-### 1. Different Prompts
+#### 1. Different Prompts
 Try various prompts to see how the model responds:
 ```python
 prompts = [
@@ -188,7 +194,7 @@ prompts = [
 ]
 ```
 
-### 2. Adjust Generation Length
+#### 2. Adjust Generation Length
 Modify the `max_tokens` parameter:
 ```python
 sampling_params = SamplingParams(
@@ -197,7 +203,7 @@ sampling_params = SamplingParams(
 )
 ```
 
-### 3. Temperature and Sampling
+#### 3. Temperature and Sampling
 Control randomness and creativity:
 ```python
 sampling_params = SamplingParams(
@@ -207,6 +213,71 @@ sampling_params = SamplingParams(
     top_k=50          # Top-k sampling
 )
 ```
+
+### 🔬 Advanced Experiments (NEW!)
+
+After understanding the basics, run these comprehensive experiments:
+
+#### Experiment 1: Parameter Testing Suite
+
+Run systematic tests of all sampling parameters:
+
+```bash
+python experiment_sampling_params.py
+```
+
+**This will test**:
+- `max_tokens`: 10, 25, 50, 100, 200
+- `temperature`: 0.0, 0.3, 0.7, 1.0, 1.5
+- `top_p`: 0.5, 0.7, 0.9, 0.95, 1.0
+- `top_k`: 10, 30, 50, 100, 200
+
+Results are automatically saved to `results/` folder with detailed analysis!
+
+**Time**: ~10 minutes
+
+#### Experiment 2: Custom Parameter Testing
+
+Test any parameter combination interactively:
+
+```bash
+# Interactive mode (recommended)
+python test_custom_params.py
+
+# Or command line
+python test_custom_params.py --prompt "Your prompt" --temperature 0.8 --max-tokens 100
+```
+
+**Great for**:
+- Testing specific use cases
+- Finding your ideal parameters
+- Quick experimentation
+
+#### Experiment 3: Compare Results
+
+Analyze and compare all your experiment results:
+
+```bash
+python compare_results.py
+```
+
+**Shows**:
+- Side-by-side parameter comparisons
+- Recommended combinations for different tasks
+- Performance statistics
+
+### 📊 Understanding the Results
+
+All experiments save results to JSON files in `results/` directory:
+
+```
+results/
+├── sampling_experiments_20260127_143022.json
+├── custom_test_20260127_143530.json
+└── ...
+```
+
+You can review these anytime to understand how parameters affect output!
 
 ## 📊 Understanding the Output
 

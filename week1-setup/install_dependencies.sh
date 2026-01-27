@@ -37,7 +37,7 @@ echo ""
 
 # Install additional dependencies
 echo "Installing additional dependencies..."
-pip install huggingface-hub transformers tqdm
+pip install huggingface-hub transformers tqdm hf_transfer
 echo "✓ Additional dependencies installed"
 echo ""
 

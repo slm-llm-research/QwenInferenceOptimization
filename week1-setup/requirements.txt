@@ -1,0 +1,16 @@
+# Week 1 Requirements
+# PyTorch with CUDA support (install separately with index-url)
+# torch>=2.0.0
+# torchvision>=0.15.0
+# torchaudio>=2.0.0
+
+# vLLM - High-performance LLM inference engine
+vllm>=0.6.0
+
+# HuggingFace utilities
+huggingface-hub>=0.20.0
+transformers>=4.40.0
+
+# Utilities
+tqdm>=4.65.0
+

@@ -1,0 +1,90 @@
+# Week 6: Kubernetes Deployment Manifest
+#
+# This manifest deploys vLLM on EKS with GPU support and exposes it via LoadBalancer.
+#
+# Usage: kubectl apply -f deployment.yaml
+#
+# Note: Update the image to your ECR repository URI
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwen-vllm
+  labels:
+    app: qwen-vllm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qwen-vllm
+  template:
+    metadata:
+      labels:
+        app: qwen-vllm
+    spec:
+      containers:
+      - name: vllm-server
+        # UPDATE THIS: Replace with your ECR image URI
+        # Example: 123456789.dkr.ecr.us-west-2.amazonaws.com/vllm-qwen:latest
+        image: YOUR_ECR_IMAGE_URI_HERE
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        resources:
+          requests:
+            nvidia.com/gpu: 1
+            memory: "16Gi"
+            cpu: "4"
+          limits:
+            nvidia.com/gpu: 1
+            memory: "24Gi"
+            cpu: "8"
+        env:
+        - name: MODEL_NAME
+          value: "Qwen/Qwen2.5-7B-Instruct"
+        # Liveness probe - check if server is responding
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 300  # 5 minutes for model loading
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        # Readiness probe - check if ready to serve
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      # Toleration for GPU nodes
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen-vllm-service
+  labels:
+    app: qwen-vllm
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: qwen-vllm
+  # Session affinity for better caching (optional)
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+

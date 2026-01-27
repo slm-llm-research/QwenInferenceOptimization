@@ -1,0 +1,9 @@
+# Week 3 Requirements (in addition to Week 1 & 2)
+
+# Profiling and visualization
+torch-tb-profiler>=0.4.0
+tensorboard>=2.13.0
+
+# Additional utilities
+numpy>=1.24.0
+

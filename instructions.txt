@@ -1,0 +1,366 @@
+Qwen2.5 Inference Optimization & Deployment Plan
+
+Week 1: Introduction and Environment Preparation
+
+Goals: Set up a working environment for vLLM and Qwen2.5 Instruct model inference. This includes installing all prerequisites, configuring CUDA/GPU support, and obtaining the Qwen2.5 model.
+	•	Install System Prerequisites: Ensure you have Linux with Python 3.9+ and a GPU with CUDA Compute Capability ≥7.0 (e.g. NVIDIA T4, A10G, A100, etc.) ￼. Verify that your CUDA toolkit version matches vLLM’s requirements (vLLM 0.9+ is built with CUDA 12.1 by default ￼). Use nvcc --version to check CUDA version ￼. If your system’s CUDA is older, consider installing CUDA 12.1 or use a vLLM wheel for your CUDA version ￼.
+	•	Install Python Libraries: Create a project directory (e.g. vllm-qwen-project) and set up a Python virtual environment. Within it, install PyTorch (with CUDA support) and vLLM:
+
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install vllm
+
+The above uses PyTorch built for CUDA 12.1 as an example. vLLM requires a working PyTorch+CUDA; confirm installation by running:
+
+python -c "import torch; print(torch.cuda.is_available())"
+
+This should print True if CUDA is accessible ￼.
+
+	•	Set Up vLLM Project Scaffold: Initialize a Git repository or folder for code. If a starter template is provided (e.g. a repository with sample code), clone it:
+
+git clone <starter_repo_url> vllm-qwen-project
+
+Otherwise, create basic scaffolding:
+
+mkdir -p vllm-qwen-project/scripts
+touch vllm-qwen-project/scripts/baseline_inference.py
+
+This structure will hold your code for each week’s experiments.
+
+	•	Download Qwen2.5 Instruct Model: Use Hugging Face to obtain the Qwen2.5 7B Instruct checkpoint. The model is open-source under Apache-2.0 ￼ ￼, so no authentication token is needed. You can download it via the Hugging Face Hub:
+
+python -c "from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen2.5-7B-Instruct')"
+
+This will cache the model locally (several GB). Alternatively, let vLLM download it on first use by specifying the model name. Qwen2.5-7B-Instruct supports up to 131k context length (with default config at 32k) ￼, making it suitable for long inputs.
+
+	•	Verify Model and Environment: Write a short test to ensure everything works. In baseline_inference.py, initialize vLLM’s LLM class with Qwen2.5:
+
+from vllm import LLM, SamplingParams
+llm = LLM(model="Qwen/Qwen2.5-7B-Instruct")
+result = llm.generate(["Hello, my name is"], SamplingParams(max_tokens=20))
+print(result[0].outputs[0].text)
+
+Run this script to load the model and generate a test output:
+
+python scripts/baseline_inference.py
+
+You should see a completion from the model, confirming that the environment is ready.
+
+Week 2: LLM Inference Profiling (Baseline)
+
+Goals: Establish baseline performance metrics for inference on the Qwen2.5 model using vLLM. You will measure token throughput and latency under various conditions, without any optimizations, to have a point of comparison for later weeks.
+	•	Run Basic vLLM Inference: Using the script from Week 1 (or a new one), load the model in local mode and perform inference on sample prompts. Use llm.generate() to produce outputs for different input sizes. For example:
+
+prompts = ["The capital of France is"] * 4  # 4 identical prompts
+outputs = llm.generate(prompts, SamplingParams(max_tokens=50))
+
+This uses a batch of 4 prompts to utilize vLLM’s continuous batching feature ￼. Each RequestOutput contains the prompt and generated text ￼ ￼. Confirm that multiple prompts are handled and that outputs look correct.
+
+	•	Benchmark Latency & Throughput: Design experiments to measure:
+	•	Latency per request: Time the llm.generate call for a single prompt vs. a batch of prompts.
+	•	Token throughput: Calculate tokens generated per second. vLLM’s output objects can be used to count tokens (e.g., sum of len(output.outputs[0].text.split()) or use usage info if available).
+	•	Effect of sequence length: Test with short prompts (e.g. 5 tokens) and long prompts (e.g. 1000 tokens if context allows) and vary max_tokens for generation. Also vary batch size (1, 4, 8 concurrent prompts).
+Use Python’s time module or time.perf_counter() around the llm.generate calls to measure elapsed time. Record the number of tokens generated in each case to compute throughput (tokens/second). For consistency, run each test multiple times and average the results.
+	•	Vary Batch Size and Sequence Length: Construct a small matrix of scenarios, for example:
+	1.	Short prompt, small batch: 1 prompt of ~5 tokens, generate 50 tokens.
+	2.	Short prompt, larger batch: 8 prompts of ~5 tokens, generate 50 tokens.
+	3.	Long prompt, small batch: 1 prompt of ~200 tokens, generate 50 tokens.
+	4.	Long prompt, larger batch: 4 prompts of ~200 tokens, generate 50 tokens.
+Measure latency for each scenario and note throughput (tokens/sec). At this baseline stage, you might observe lower GPU utilization for small batches or see how longer context affects speed (longer prompts require more processing per token).
+	•	Record Initial Metrics: Create a log or table of your findings. For example:
+	•	1 prompt, 50 tokens out: X seconds, Y tokens/sec.
+	•	4 prompts, 50 tokens out: X2 seconds, Y2 tokens/sec.
+	•	etc.
+These numbers will serve as your baseline. Expect that a higher batch (more concurrent sequences) increases throughput (total tokens/sec) due to better GPU utilization ￼ ￼, at the cost of slightly higher per-request latency.
+	•	Analyze GPU Utilization: Optionally, use system tools to observe hardware usage. Run nvidia-smi dmon -s u in a separate terminal during inference to monitor GPU utilization and memory. At baseline, you might see that not all GPU memory is used or utilization % spikes during generation bursts.
+	•	Document Observations: Note any obvious bottlenecks. For instance, if a single sequence doesn’t fully utilize the GPU, or if latency scales with prompt length roughly linearly. These observations will guide optimizations in upcoming weeks.
+
+(Sources: vLLM basic usage example shows how to call llm.generate and retrieve outputs ￼ ￼.)
+
+Week 3: GPU-Level Optimization and Profiling
+
+Goals: Use profiling tools to identify performance bottlenecks at the GPU level, then apply vLLM-specific optimizations. You will adjust engine parameters like max_num_seqs, gpu_memory_utilization, and swap_space to improve throughput, and leverage vLLM’s PagedAttention debugging to assess KV cache usage.
+	•	Enable Profiling Tools: Integrate the PyTorch Profiler with vLLM. vLLM allows easy profiling by specifying a profiler config when creating the LLM or by using its methods ￼ ￼. For example, in your script:
+
+llm = LLM(model="Qwen/Qwen2.5-7B-Instruct", profiler_config={"profiler": "torch", "torch_profiler_dir": "./vllm_profile"})
+llm.start_profile()
+outputs = llm.generate(prompts, sampling_params)
+llm.stop_profile()
+
+After running this, vLLM will save a PyTorch trace in ./vllm_profile ￼ ￼. Open this profile (e.g., with TensorBoard or Chrome’s trace viewer) to visualize timeline of operations. Identify if the GPU is underutilized (gaps between kernels indicating idle time) or if certain kernels dominate time (e.g., attention or KV cache management).
+
+	•	Nsight Systems Profiling (optional): If using a Runpod GPU instance or a local machine with Nsight, run a session to capture low-level GPU activity. For example, on the shell:
+
+nsys profile -o week3_profile -t cuda,nvtx,osrt python scripts/baseline_inference.py
+
+This collects CUDA kernel timing, which you can later inspect in Nsight Systems GUI. Look for stalls or memory copy operations. Particularly check GPU memory copy activity if CPU offloading is happening (which would indicate KV swap usage).
+
+	•	Analyze Compute vs Memory Bottlenecks: From the profiles, determine if your model is compute-bound (high ALU utilization) or memory-bound (waiting on memory, indicated by low SM usage or many memory copy operations). Also note if the GPU has free memory left during execution (profile or nvidia-smi can show this). If a large portion of GPU memory is unused, increasing batch or sequence count could help utilize it.
+	•	Tune gpu_memory_utilization: By default, vLLM allocates 90% of GPU memory for its executor (KV cache, etc.) ￼. You can raise this to utilize more VRAM if safe, or lower it to leave headroom. For instance, set GPU_MEMORY_UTILIZATION=0.95 as an environment variable or engine argument to use 95% of VRAM ￼. Monitor if this allows a higher max_num_seqs (more parallel sequences) without OOM. Caution: Using 100% can leave no room for PyTorch buffers or CUDA context, so 0.95 is a reasonable upper bound ￼.
+	•	Tune max_num_seqs: This parameter caps how many sequences can be processed concurrently ￼ ￼. By default it’s often 256 ￼, but if your GPU has spare memory, increasing it can boost concurrency. Try launching LLM with llm = LLM(model=..., max_num_seqs=512) or using the env var MAX_NUM_SEQS. According to vLLM docs, you want this as high as possible without causing OOM ￼ ￼, since higher concurrency yields higher throughput ￼. After changing, re-run your throughput tests from Week 2. You may see throughput improve if the model can handle more sequences in parallel.
+	•	Tune swap_space: vLLM can offload KV cache to CPU if GPU memory is a bottleneck when max_num_seqs is very high ￼. The default swap space per GPU is 4 GiB on CPU ￼. If you attempt a very large max_num_seqs and hit GPU OOM, vLLM will start swapping to CPU (check logs for swap usage). This prevents crashes but adds latency due to data transfer ￼. You can experiment by increasing swap_space (e.g., to 8 GiB) to support more sequences, but note the latency impact ￼. Use this only if necessary (e.g., trying to handle hundreds of concurrent requests on a smaller GPU).
+	•	PagedAttention Debugging: vLLM’s core innovation is PagedAttention, which manages the KV cache efficiently by paging memory ￼ ￼. To inspect its effectiveness, enable verbose logging for the cache. Set environment variable VLLM_LOG_STATS=1 or use disable_log_stats=False (which is default to collect stats) ￼ ￼. When you run vLLM (especially in server mode or with logging enabled), it will report statistics like cache block usage and fragmentation. After running a batch of requests, look for logs about KV cache – e.g., how many blocks used vs allocated. If you see that only a small fraction of the allocated KV memory is used for your workload, you might reduce gpu_memory_utilization to free memory or increase max_num_seqs to utilize it. Goal: Ensure near-zero memory waste in KV cache (PagedAttention should yield high utilization of allocated blocks ￼).
+	•	Profiling Results: Summarize what changes had the biggest effect. For example, you might find that bumping max_num_seqs from 256 to 512 improved throughput significantly until you hit an OOM, indicating the sweet spot is just below OOM threshold ￼. Or you might find GPU was underutilized and after tuning, continuous batches keep it busy (as shown by fewer idle gaps in the profiler timeline). Note any improvement in tokens/sec from baseline to now.
+
+(Sources: vLLM parameters and their impact – raising max_num_seqs increases concurrency ￼ ￼, swap_space allows higher concurrency at cost of latency ￼. gpu_memory_utilization default is 0.9 ￼ and can be tuned ￼. PagedAttention concept from vLLM background ￼.)
+
+Week 4: Guest Lectures and Explorations (Integration Week)
+
+Goals: Use this lighter week to broaden understanding. Attend guest lectures or read engineering blog posts about LLM inference at scale. Optionally integrate external tools or libraries. (This week is intentionally open-ended to absorb knowledge before final optimizations.)
+	•	Guest Lecture/Reading Suggestions: Focus on content related to high-performance inference serving:
+	•	A talk or paper on vLLM’s architecture (e.g., the “Efficient Serving with PagedAttention” paper ￼) to solidify how vLLM differs from standard Hugging Face pipelines.
+	•	Blogs on real-world LLM deployment (e.g., how OpenAI serves ChatGPT, or how MosaicML/Intel optimize inference). Understanding industry practices in model optimization (quantization, compiler optimizations, etc.) can inspire final tweaks.
+	•	If available, a lecture on GPU profiling or NVIDIA Nsight to interpret profiles more deeply.
+	•	Experiment with Advanced Features (Optional): This is a good time to try vLLM features that were not yet used:
+	•	Continuous batching scheduler policies: vLLM defaults to FCFS scheduling. You might explore priority scheduling if relevant (though likely not needed for our case) ￼.
+	•	Speculative decoding: If Qwen2.5 supports it, vLLM can use a draft model to accelerate generation ￼. This is complex to set up (needs a smaller model), but reading about it will increase your understanding of inference acceleration techniques.
+	•	Tensor parallel vs pipeline parallel: Review how vLLM supports multi-GPU on one node (tensor parallelism) vs across nodes (pipeline/data parallel). This will prepare you for distributed deployment next week ￼ ￼. You can try enabling tensor parallel on a multi-GPU machine if accessible (e.g., tensor_parallel_size=2) to see how it splits the model ￼.
+	•	Update Project Documentation: Take this week to refine documentation in your repo. Add comments to your scripts explaining the meaning of each vLLM parameter you’ve tuned (e.g., why we chose a certain max_num_seqs). Document any insights from guest lectures – for instance, if a lecture mentioned a tool like DeepSpeed’s inference engine or Hugging Face Text Generation Inference, note how they differ from vLLM. This contextual knowledge can be valuable in the final demo and Q&A.
+	•	No Major Deliverables: There is no specific coding task due this week, but ensure you’re prepared for the final stretch. Double-check that you can reproduce your profiling results and that all team members understand the optimizations done so far. If anything was unclear in previous weeks (e.g., an unexpected profiler result or a confusing vLLM log message), use this time to clarify it via documentation or forum discussions.
+
+(Sources: Background on vLLM’s innovations like PagedAttention ￼ and continuous batching ￼ can be reviewed. Guest materials are external and not directly cited from documentation.)
+
+Week 5: Parallelism and Distributed Inference
+
+Goals: Scale out the inference to utilize multiple GPUs, simulating a production load. You will configure tensor parallelism on a multi-GPU instance and also emulate concurrent client requests to test scheduler behavior under load.
+	•	Enable Tensor Parallelism (TP): Spin up a multi-GPU environment. This could be a Runpod instance with 2 or 4 GPUs (A100s or similar) or any access to multiple GPUs. With vLLM, enabling TP is straightforward: specify tensor_parallel_size when initializing the LLM or via command-line. For example, on a node with 4 GPUs, use:
+
+llm = LLM(model="Qwen/Qwen2.5-7B-Instruct", tensor_parallel_size=4)
+
+This will shard the model weights across 4 GPUs, allowing you to serve a model larger than one GPU’s memory or to serve the same model with increased compute throughput ￼ ￼. Verify that the model loads correctly by observing logs – vLLM should report each rank loading a partition of the model. Note that with TP, each generation request still utilizes all GPUs for different parts of the model in parallel ￼, so you should expect near-linear speedup for large models if communication overhead is low.
+
+	•	Concurrent Inference Requests: Simulate multiple clients sending requests simultaneously. Write a simple loop or use Python threads/asyncio to issue llm.generate calls in parallel. For example, using asyncio:
+
+import asyncio
+prompts = ["Tell me a joke about AI"] * 10  # 10 concurrent requests
+async def generate_async(prompt):
+    return llm.generate([prompt], SamplingParams(max_tokens=30))
+results = await asyncio.gather(*(generate_async(p) for p in prompts))
+
+This will send 10 generation requests at nearly the same time. vLLM’s continuous batching scheduler should intermix these and utilize available GPU capacity efficiently ￼. Measure the throughput and latency in this scenario. Compare it to a single batch of 10 prompts in one llm.generate call – the outcomes should be similar since vLLM will batch them internally either way.
+
+	•	Observe Scheduler Behavior: With many concurrent requests, monitor how vLLM schedules tokens:
+	•	Are shorter requests finishing earlier? (They might, since once a request’s tokens are generated, it leaves the batch.)
+	•	If using the default first-come-first-served policy, all requests are treated equally in order of arrival ￼. Optionally, test the priority policy by assigning priorities to requests if vLLM exposes that, but by default priority is not used unless specified ￼.
+	•	Use vLLM’s logging (with disable_log_stats=False) to see iteration details: it can log how many tokens are processed per iteration and how many sequences are active ￼ ￼. This will show if the scheduler is keeping the GPU busy every step (ideally, each iteration processes the max tokens or max sequences allowed).
+	•	Test Long vs Short Sequence Mixing: Create a scenario with mixed prompt lengths to see scheduler fairness. E.g., 2 requests with very long prompts (several thousand tokens) and 2 requests with very short prompts. Enable chunked prefill (--enable-chunked-prefill in engine args or enable_chunked_prefill=True) so that long prompt processing can be broken into chunks ￼ ￼. This feature allows decoding work to interleave with filling a long prompt. Verify via logs if shorter prompts “jump ahead” while the long prompt is being processed (which would reduce latency for the short prompts instead of having them wait behind the long one).
+	•	Throughput with TP vs Single GPU: Using the multi-GPU setup (TP=2 or 4), run the same throughput tests from Week 2 (adjusted to this environment). A 7B model may not strictly need multi-GPU, but by simulating as if it were larger (or actually using a larger Qwen model if possible), note the differences:
+	•	TP should allow you to handle larger batch sizes since each GPU carries part of the load ￼. For instance, if each GPU had 16GB and the model is 7B (around ~14GB in FP16), TP=2 splits memory so each uses ~7GB, leaving more room for KV cache on each. This could allow a higher max_num_seqs effectively.
+	•	Latency per token might slightly increase with TP due to cross-GPU communication overhead, but overall throughput (tokens/sec across all GPUs) should increase.
+	•	Record Distributed Metrics: Document the latency of an example request on 1 GPU vs 2 GPUs vs 4 GPUs. Also record total throughput (e.g., with 100 concurrent prompts, how many tokens/sec are processed on 1 GPU vs multiple). If done properly, you might see close to linear scaling of throughput with the number of GPUs for large loads, as vLLM is designed to scale well with additional GPUs ￼ ￼.
+	•	Results Analysis: Summarize how well vLLM scales and handles parallel requests. Note any diminishing returns (e.g., if 4 GPUs didn’t give 4× throughput, perhaps communication overhead or batch scheduling limits kicked in). Also note the effect of context length on multi-GPU – extremely long contexts might not parallelize perfectly if chunked prefill is not enabled across GPUs. These findings will inform how to configure the production deployment in the next week (for example, how many replicas or how to distribute traffic).
+
+(Sources: vLLM tensor parallel sharding allows larger models by splitting layers across GPUs ￼ ￼. Continuous batching ensures incoming concurrent requests are handled efficiently without waiting for batch boundaries ￼. Scheduler policies and chunked prefill from vLLM docs ￼.)
+
+Week 6: Deploying a Production-Ready Stateful Inference System
+
+Goals: Package the optimized inference system into a Docker container and deploy it in two environments: (1) on Runpod as a serverless GPU endpoint, and (2) on an AWS EKS (Kubernetes) cluster with GPU nodes. Ensure the system is production-ready with proper configuration, autoscaling, and logging. Importantly, learn how to tear down all resources cleanly to avoid unnecessary costs.
+	•	Containerize the vLLM Application: Write a Dockerfile to encapsulate the environment. For example:
+
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+RUN apt-get update && apt-get install -y python3.10 python3-pip git && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir torch==2.0.1+cu121 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+RUN pip install --no-cache-dir vllm
+# Copy model weights (optional: could also rely on HF download at runtime)
+COPY --from=huggingface-hub Qwen/Qwen2.5-7B-Instruct /models/Qwen2.5-7B-Instruct
+ENV HF_HOME=/models
+# Expose port for API server
+EXPOSE 8000
+CMD ["vllm", "serve", "Qwen/Qwen2.5-7B-Instruct", "--port", "8000", "--tensor-parallel-size", "1"]
+
+This Dockerfile uses NVIDIA’s CUDA base image and installs vLLM and PyTorch. It optionally copies the Qwen model into the image for faster startup (assuming you have a way to add it, or else the container will download it on first run). The CMD launches vLLM’s built-in OpenAI-compatible HTTP server on port 8000 serving the model ￼. Adjust tensor-parallel-size as needed (e.g., use "4" if deploying to a 4-GPU node).
+
+	•	Build and Push Image: Build the Docker image and push it to a registry accessible from your deployment environments (Docker Hub or AWS ECR).
+
+docker build -t myrepo/vllm-qwen:latest .
+docker push myrepo/vllm-qwen:latest
+
+Ensure the image is relatively lean by not including unused files. The model weights will make it large (~>10GB), but that’s expected. If storage is a concern, you could also mount model weights via volume instead.
+
+	•	Runpod Deployment (Serverless Endpoint): Create a deployment on Runpod using their serverless UI or CLI:
+	•	Go to Runpod Cloud and select Deploy for the vLLM worker (Runpod offers a pre-built vLLM server image) ￼. In Advanced settings, input the model name Qwen/Qwen2.5-7B-Instruct and your desired max context (e.g., 8192) ￼. Alternatively, use your custom image by specifying its name in an advanced configuration.
+	•	Set environment variables in Runpod for any tuned parameters (via the “Edit Endpoint -> Public Environment Variables” UI): e.g. MAX_MODEL_LEN=32768 if you want to support long contexts, GPU_MEMORY_UTILIZATION=0.95 to maximize VRAM usage ￼.
+	•	Select an appropriate GPU type (A10G or L4 for cost-efficiency, or A100 for max performance) and instance size. For example, an NVIDIA A10G (g5.xlarge) has 1 GPU and 24 GB VRAM, suitable for the 7B model.
+	•	Deploy the endpoint. Runpod will spin up the container and download the model. Once the status is Running, note the endpoint ID and URL.
+Test the Runpod endpoint using their provided interface or cURL:
+
+curl -X POST <RUNPOD_ENDPOINT_URL>/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Hello, my name is", "max_tokens": 50}'
+
+You should receive a completion in JSON format (vLLM’s server mimics OpenAI’s API).
+
+	•	AWS EKS Cluster Setup: Create a Kubernetes cluster to host the model in a more traditional production setting. If inexperienced with K8s, eksctl is the simplest tool:
+
+eksctl create cluster --name llm-inference --region us-west-2 \
+  --node-type g5.xlarge --nodes=1 --nodes-min=1 --nodes-max=3 \
+  --with-oidc --ssh-access --ssh-public-key mykey.pub
+
+This command (for AWS) creates a cluster named llm-inference with a managed node group using g5.xlarge (A10G GPU) instances, min 1 and max 3 nodes for autoscaling. eksctl will automatically pick an Amazon Linux GPU AMI and install the NVIDIA device plugin on the nodes ￼, so the GPU is accessible in Kubernetes ￼. Verify the node is Ready:
+
+kubectl get nodes -o wide
+
+It should show a node with label instance-type=g5.xlarge and nvidia.com/gpu=1 resource available (use kubectl describe node | grep nvidia.com/gpu to confirm GPU resource ￼).
+
+	•	Deploy vLLM on EKS: Create a Kubernetes Deployment manifest (save as vllm-deployment.yaml):
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwen-vllm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qwen-vllm
+  template:
+    metadata:
+      labels:
+        app: qwen-vllm
+    spec:
+      containers:
+      - name: vllm-server
+        image: myrepo/vllm-qwen:latest
+        args: ["--max-num-seqs", "256", "--gpu-memory-utilization", "0.9"]
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+              # requests for CPU/memory can be added as needed
+        volumeMounts:
+        - name: hf-cache
+          mountPath: /root/.cache/huggingface
+      volumes:
+      - name: hf-cache
+        emptyDir: {}  # Using emptyDir for caching model downloads
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen-vllm-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: qwen-vllm
+
+This configuration deploys one pod running the vLLM server (listening on port 8000 internally) and exposes it via a LoadBalancer Service on port 80. It requests 1 GPU per pod (nvidia.com/gpu: 1). We mount an emptyDir to /root/.cache/huggingface to cache model files across pod restarts (so that if the pod is rescheduled, it doesn’t re-download the entire model).
+Apply the deployment:
+
+kubectl apply -f vllm-deployment.yaml
+
+Kubernetes will pull the image and start the pod. Wait for the pod to be Running (kubectl get pods). The Service of type LoadBalancer will provision an external IP (AWS ELB). Get the service URL:
+
+kubectl get svc qwen-vllm-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+
+This hostname can be used to send requests (it may take a couple of minutes for AWS to allocate it).
+
+	•	Benchmark Remote Endpoint: Once the EKS service is up, test it similarly to Runpod:
+
+curl -X POST http://<ELB_HOSTNAME>/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "AWS EKS test prompt.", "max_tokens": 10}'
+
+The response should come back with a completion. Measure the latency of a few requests from your client machine. Compare it with Runpod’s latency. Minor differences might occur due to network overhead or instance type differences, but both should be on the order of a few hundred milliseconds for a short prompt.
+
+	•	Configure Autoscaling: In EKS, you can autoscale at the pod level or node level:
+	•	Pod Autoscaling (HPA): Deploy a Horizontal Pod Autoscaler for the deployment:
+
+kubectl autoscale deploy qwen-vllm --min=1 --max=3 --cpu-percent=70
+
+This would create additional pods if CPU usage exceeds 70%. However, for GPU workloads, CPU might not be the best metric. An alternative is to use custom metrics (like QPS or latency) for autoscaling, which is advanced. Simpler: scale by hand or based on GPU memory if you have metrics.
+
+	•	Cluster Autoscaler: Ensure the node group can scale out. eksctl already set max nodes to 3 in the example. Install the Kubernetes Cluster Autoscaler so that if HPA schedules a second pod and no GPU node is free, a new node will spin up. AWS provides a Cluster Autoscaler that respects the nvidia.com/gpu resource requests.
+For our setup, you might keep one pod with one GPU, as the model is large. But know that scaling horizontally (multiple pods) would typically require either using data parallel (each pod serving independently behind a load balancer) or a sharded model approach. vLLM supports multi-node serving via its own means (data parallel groups) ￼ ￼, but that is complex; easier is to run independent pods each with the model and use a higher-level load balancer to distribute incoming requests (the Kubernetes Service will do this round-robin by default).
+
+	•	Logging and Monitoring: For logging, the container’s STDOUT (where vLLM logs go) is captured by Kubernetes. Enable EKS CloudWatch logging (if not enabled by eksctl, you can do so via AWS Console or the eksctl utils update-cluster-logging command). This will send pod logs to CloudWatch – you should see vLLM startup logs and any requests if logged. Additionally, consider setting up Prometheus to scrape metrics. vLLM exposes metrics if run with an API server; for example, vLLM’s OpenAI API server mode has prometheus endpoints ￼. If time permits, deploy the Prometheus-Grafana stack (EKS has add-ons or use Helm charts) and import vLLM’s example dashboard ￼ to monitor token throughput, latency, etc.
+	•	Teardown Instructions – Runpod: To avoid ongoing charges on Runpod, delete the endpoint when not needed:
+	•	In Runpod console, navigate to the endpoint and click Terminate. Confirm deletion. This will shut down the GPU instance. Ensure it’s really off (no active endpoints listed in your account) to stop billing.
+	•	Alternatively, if using the Runpod CLI or API, issue the delete endpoint call as documented. Double-check that any persistent storage (if you attached volumes) is also deleted if not needed.
+	•	Teardown Instructions – EKS: An EKS cluster will continue running (and accruing cost for the node and possibly the control plane if not using EKS free tier) until deleted:
+
+eksctl delete cluster --name llm-inference --region us-west-2
+
+This will destroy the entire cluster, including all nodes, load balancers, and associated resources created by Kubernetes (like the ELB for the service). Before running this, you might delete the deployment and service:
+
+kubectl delete -f vllm-deployment.yaml
+
+AWS may then automatically clean up the ELB. After cluster deletion, verify in AWS console that no EC2 instances are running and no ELBs remain. Also delete the ECR image repository if you created one and no longer need the image, to avoid storage costs (ECR charges per GB-month).
+
+	•	Verification of Teardown: Ensure that:
+	•	Runpod shows no running endpoints (to avoid charges).
+	•	eksctl get cluster shows no cluster, and AWS EC2 lists no instances.
+	•	CloudWatch logging (if enabled) can also be cleaned up by deleting log groups related to the cluster, though this is minor cost.
+
+By the end of this week, you will have a robust deployment of Qwen2.5 on a scalable platform, with the ability to handle real-world traffic and the knowledge to safely manage resources. Document all the steps in your repo (perhaps a README with deployment instructions) for future reference.
+
+(Sources: Runpod deployment steps from official docs ￼ ￼. EKS deployment YAML adapted from vLLM documentation example ￼ ￼, adjusted for Qwen. Teardown procedures based on eksctl usage and AWS best practices.)
+
+Week 7: Demo Day – Load Test and Final Teardown
+
+Goals: Demonstrate the system under a heavy load (100+ concurrent users), observe performance (throughput, latency, error rates), and gracefully tear down all infrastructure post-demo. This week is about validating that the optimized deployment meets requirements and showcasing its capabilities.
+	•	Load Testing Setup: Use a load testing tool like Locust or a custom script to simulate 100+ concurrent users hitting the API. Locust is recommended for ease:
+	•	Install Locust:
+
+pip install locust
+
+
+	•	Write a locustfile.py targeting your API (choose either the Runpod endpoint or the EKS LoadBalancer URL):
+
+from locust import HttpUser, task, between
+
+class QwenUser(HttpUser):
+    wait_time = between(0.5, 3)  # users wait 0.5 to 3 sec between requests
+    @task
+    def generate_text(self):
+        prompt = "Once upon a time, "  # sample prompt
+        self.client.post("/v1/completions", json={
+            "prompt": prompt, "max_tokens": 100
+        })
+
+This defines a user behavior of continuously POSTing to the completions endpoint with a prompt. The wait_time introduces a tiny delay to mimic think time between requests.
+
+	•	Run Locust in headless mode to simulate, say, 100 users spawning at 10 per second:
+
+locust --headless -u 100 -r 10 -H http://<YOUR_ENDPOINT_HOST>
+
+Locust will output statistics to the console. It reports requests per second, and response time percentiles ￼ ￼. Let it run for a few minutes to stabilize metrics.
+
+	•	Monitor Performance: During the load test, keep an eye on:
+	•	Throughput: Locust will show total requests per second. Because each “request” generates text, this roughly correlates with how many prompts per second your system handles. Note this value at 100 users.
+	•	Latency: Locust’s percentile report shows, for example, median and 95th percentile latency ￼. Check that median latency stays reasonable (e.g., if median is ~200ms and 95th is ~300ms for a 100-token completion, that’s good). If latency starts increasing drastically or timeouts occur as users increase, that indicates the system’s capacity limit.
+	•	Errors: Ensure error rate is 0%. vLLM should queue or reject requests rather than crash. If you see any failures in Locust output (non-2xx responses), investigate logs to find the cause (could be OOM or too many parallel requests for the default scheduler).
+	•	Resource Utilization Check: On EKS, you can use kubectl top pods (if metrics-server installed) to see CPU/Mem usage. Also nvidia-smi on the node (via kubectl exec) to see GPU usage. Ensure the GPU isn’t overcommitted. If using Runpod, their dashboard might show GPU utilization. Ideally, the GPU should be running near 90-100% utilization under load, meaning our earlier optimizations worked (no significant idle time).
+	•	Profile Under Load (Optional): If feasible, run a short Nsight Systems or PyTorch profiler capture during the load test to see if any new bottleneck appears at scale (for example, CPU thread contention or memory bandwidth issues). This is optional and advanced; the main goal on demo day is to observe live behavior, not to optimize further.
+	•	Demonstrate Live Queries: Prepare a few example prompts to run live to show the quality of responses. For instance, query: “Summarize the importance of inference optimization in LLM deployment.” and display the answer from Qwen2.5, illustrating that despite heavy load, the system can still handle individual requests promptly.
+	•	Final Statistics: After the load test, summarize the results:
+	•	Achieved X requests per second with 100 concurrent users.
+	•	Average latency was Y ms (with P95 latency Z ms).
+	•	No failures occurred (or if they did, note the percentage and reason).
+	•	The system likely generated on the order of (requests * tokens) tokens – e.g., 100 users * ~X tokens/sec each = N tokens/sec total throughput.
+	•	Final Teardown Checklist: Once the demo is complete:
+	•	Runpod: If you re-deployed for demo, terminate the endpoint again.
+	•	EKS: Delete any remaining resources. If you kept the cluster running from Week 6, you can delete the deployment:
+
+kubectl delete deployment qwen-vllm
+kubectl delete service qwen-vllm-service
+
+This will drop the pods and ELB. Verify the ELB is gone (AWS console) and then delete the cluster:
+
+eksctl delete cluster --name llm-inference
+
+Confirm all nodes are terminated.
+
+	•	Cloudwatch logs (if enabled): consider exporting or downloading logs you need, then you may delete the log group for the cluster to tidy up.
+	•	Cost checks: Ensure no stray EBS volumes, IP addresses, or other cloud artifacts are left allocated. The eksctl delete cluster should have cleared most, but it’s good practice to double-check AWS resources.
+
+	•	Retrospective: In your final report/presentation, include how the system improved from baseline:
+	•	Inference throughput increased from the baseline (Week 2) of, say, X tokens/s to Y tokens/s after optimizations in Week 3 (on single GPU), and further scaled to Z tokens/s with multi-GPU in Week 5.
+	•	Latency under load was manageable due to continuous batching and optimizations.
+	•	The chosen deployment (EKS/Runpod) proved capable of hosting the model reliably.
+Also discuss any trade-offs or limitations encountered (e.g., maybe memory swapping was needed at very high concurrency, impacting latency, or the 7B model size is easily handled but a larger model might require more aggressive sharding or quantization).
+	•	Conclusion: After verifying everything, you have successfully taught and demonstrated how to optimize LLM inference and deploy it at scale. All resources are now cleaned up, and the knowledge (and possibly code repository) can be handed over for future use.
+
+(Sources: Locust usage example for headless mode ￼ showing how to run with a set number of users and spawn rate. Percentile output interpretation ￼. General best practices for AWS resource teardown.)

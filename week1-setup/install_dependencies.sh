@@ -41,6 +41,12 @@ pip install huggingface-hub transformers tqdm hf_transfer
 echo "✓ Additional dependencies installed"
 echo ""
 
+# Install visualization dependencies (for visualize_results.py)
+echo "Installing visualization dependencies..."
+pip install matplotlib seaborn numpy
+echo "✓ Visualization dependencies installed"
+echo ""
+
 echo "================================================"
 echo "Installation Complete!"
 echo "================================================"
@@ -49,5 +55,7 @@ echo "Next steps:"
 echo "1. Run: python verify_environment.py"
 echo "2. Run: python download_model.py"
 echo "3. Run: python baseline_inference.py"
+echo "4. Run: python experiment_sampling_params.py"
+echo "5. Run: python visualize_results.py  (generates plots!)"
 echo ""
 

@@ -1,5 +1,9 @@
 # Week 2 Benchmark Results: Understanding Your Numbers
 
+> **📊 This guide includes embedded visualizations!**  
+> If you don't see images below, run: `python generate_insights_plots.py`  
+> View this file in a Markdown viewer (VS Code, GitHub, etc.) for best experience.
+
 ## 📊 Overview: What Did You Just Measure?
 
 You've run comprehensive benchmarks across three dimensions:
@@ -9,31 +13,32 @@ You've run comprehensive benchmarks across three dimensions:
 
 This guide will help you understand **what these numbers mean** and **how to use them**.
 
+**This document is interactive** - scroll through to see your actual benchmark results visualized with charts and graphs!
+
 ---
 
-## 📈 Visual Overview: Generate Your Plots First!
+## 📈 Visual Overview: Your Complete Performance Dashboard
 
-Before diving into the analysis, **generate visualizations** from your results:
+### 🎛️ Complete Dashboard - Everything At A Glance
+
+![Comprehensive Performance Dashboard](results/comprehensive_dashboard.png)
+
+**What you're seeing above**:
+- **Top Row**: Output scaling (linear!) + Percentile bars
+- **Middle Row**: Use case performance comparison (optimization priorities)
+- **Bottom Row**: Time allocation (85% queue!) + Capacity metrics
+
+---
+
+### 📊 Don't See the Plots? Generate Them!
+
+If images aren't showing, run:
 
 ```bash
-python generate_insights_plots.py
+python generate_insights_plots.py  # Takes ~10 seconds
 ```
 
-**This creates 8 plots in `results/` folder:**
-1. `latency_scaling.png` - How output length affects latency
-2. `percentile_distribution.png` - P50/P90/P95/P99 visualization
-3. `use_case_performance.png` - Which workloads are slowest
-4. `queue_time_breakdown.png` - Where time is spent (critical!)
-5. `throughput_analysis.png` - Batch scaling benefits
-6. `sequence_length_impact.png` - Sequence length categories
-7. `consistency_analysis.png` - Performance predictability
-8. `comprehensive_dashboard.png` - Complete overview
-
-**Time**: ~10 seconds
-
-**Then**: Open the plots and read this guide together for maximum understanding! 📊
-
----
+Then reload this file - all 8 plots will be embedded throughout this guide!
 
 ---
 
@@ -108,6 +113,15 @@ By Use Case (P95 latency):
 - SLA reference lines showing which use cases meet targets
 - Clear visual of which categories need Week 3 optimization
 
+![Use Case Performance Comparison](results/use_case_performance.png)
+
+**What to notice in this plot**:
+- 🟢 Green bars: Ultra-short and code_short perform excellently
+- 🟠 Orange bars: Medium explanations acceptable but near limit
+- 🔴 Red bars: Long-form content clearly exceeds SLA targets
+- 📏 Blue/purple dashed lines: SLA thresholds (1.5s, 2.0s)
+- 🎯 Visual prioritization: Tall red bars = optimize first!
+
 ---
 
 ### 2. **Percentiles (P50, P90, P95, P99)**
@@ -141,6 +155,15 @@ Overall Latency Distribution:
 - Left panel: Bar chart showing the dramatic increase from P50 → P99
 - Right panel: Cumulative distribution curve showing exactly where latency jumps
 - SLA reference lines (1.5s, 2.0s) showing which percentiles meet targets
+
+![Percentile Distribution Analysis](results/percentile_distribution.png)
+
+**What to notice in this plot**:
+- 🟢 P50 (green bar): 0.85s - most users have good experience
+- 🟡 P90 (yellow): 2.33s - starts getting slow
+- 🟠 P95 (orange): 2.54s - **SLA target**, exceeds 2s threshold
+- 🔴 P99 (red): 4.40s - worst 1% wait very long
+- 📈 Right: Cumulative curve shows the steep climb after P90
 
 **Why this happens**:
 - Long prompts take longer
@@ -186,6 +209,14 @@ Batch Processing (Mixed Workload):
 - Speedup annotations showing 2x, 4x, 8x, 10x improvements
 - Right panel: Your system's capacity metrics (949 tok/s, 4.6 req/s)
 
+![Throughput Analysis](results/throughput_analysis.png)
+
+**What to notice in this plot**:
+- 📈 Left: Throughput increases dramatically with batch size (log scale)
+- 🔢 Annotations show 3.6x, 6.7x, 10.7x speedup
+- 💪 Right: Production capacity showing 949 tok/s (strong!) and 4.6 req/s
+- 🎯 Batching is powerful - goes from 42 to 450+ tok/s!
+
 #### Throughput by Use Case:
 
 Looking at individual request types in your production test:
@@ -229,6 +260,14 @@ From Production Throughput Test:
 - Percentages showing 85% waiting, 15% working
 - Pie chart dramatically illustrating the imbalance
 - **This is your #1 optimization target!**
+
+![Queue Time Breakdown](results/queue_time_breakdown.png)
+
+**What to notice in this plot**:
+- 🔴 Left: Massive red bars = queue time dominates across all percentiles
+- 🥧 Right: Pie chart shockingly shows 85% waiting (red) vs 15% working (green)
+- 🚨 **This is the smoking gun** - most capacity is wasted on waiting!
+- 🎯 Week 3 goal: Flip this ratio by increasing concurrent sequences
 
 **Why this happens**:
 - You're processing requests **sequentially** in the production test
@@ -280,6 +319,14 @@ Short prompt, 20 tokens:
 - Bottom panel: Coefficient of variation bars (all green = excellent!)
 - Your system has rock-solid consistency across all test cases
 
+![Consistency Analysis](results/consistency_analysis.png)
+
+**What to notice in this plot**:
+- 📏 Top: Tiny error bars = extremely low variance
+- 🟢 Bottom: All green bars < 5% = excellent consistency
+- ✅ Reference lines show you're well below "good" threshold
+- 🎯 Predictable performance = happy users!
+
 ---
 
 ## 🔬 Deep Dive: Understanding Scaling Relationships
@@ -305,6 +352,14 @@ Output Tokens    Latency    Latency/Token    Scaling
 - Left panel: Latency increases linearly with output tokens (straight line!)
 - Right panel: Throughput stays constant ~100 tok/s (flat line = consistent)
 - Red dashed line: Linear fit showing the 10ms/token rate
+
+![Latency Scaling Analysis](results/latency_scaling.png)
+
+**What to notice in this plot**:
+- ✅ Left graph: Perfect straight line = linear scaling
+- ✅ Right graph: Flat line = consistent throughput
+- ✅ All three prompt lengths (short/medium/long) follow same pattern
+- 📐 The red fit line shows: **10.2ms per token** (your system's constant)
 
 **What this means**:
 - Predictable: You can estimate latency for any output length
@@ -378,6 +433,16 @@ Very Long     500+ tokens       4.396s         15.8x
 - The gap between tiny and very_long is dramatic (15x!)
 - SLA reference line showing where you exceed targets
 - Clear visual of which sequence categories need optimization
+
+![Sequence Length Impact](results/sequence_length_impact.png)
+
+**What to notice in this plot**:
+- 📈 All three lines (P50/P95/P99) climb exponentially
+- 🟢 Green line (P50): Manageable growth
+- 🟠 Orange line (P95): Crosses 2s SLA at "Long" category
+- 🔴 Red line (P99): Exceeds 4s for very long sequences
+- 📐 Blue dashed line: 2s SLA threshold
+- 🎯 Clear cutoff: Keep sequences < 300 tokens for best performance
 
 ---
 
@@ -653,6 +718,40 @@ LLaMA-2-7B:      ~0.8-1.2s typical
    - Current: ~5 req/s → 10 req/s
 
 **You have the baseline. Now let's optimize!** 🎯
+
+---
+
+## 📊 All Visualizations: Complete Reference
+
+### Plot Gallery
+
+Here are all 8 plots for easy reference:
+
+#### 1. Comprehensive Dashboard (Start Here!)
+![Dashboard](results/comprehensive_dashboard.png)
+
+#### 2. Latency Scaling (Linear Proof)
+![Latency Scaling](results/latency_scaling.png)
+
+#### 3. Percentile Distribution (Tail Latency)
+![Percentiles](results/percentile_distribution.png)
+
+#### 4. Queue Time Breakdown (Critical Finding!)
+![Queue Time](results/queue_time_breakdown.png)
+
+#### 5. Use Case Performance (Optimization Priorities)
+![Use Cases](results/use_case_performance.png)
+
+#### 6. Sequence Length Impact (Scaling Analysis)
+![Sequence Length](results/sequence_length_impact.png)
+
+#### 7. Throughput Analysis (Batching Benefits)
+![Throughput](results/throughput_analysis.png)
+
+#### 8. Consistency Analysis (Predictability)
+![Consistency](results/consistency_analysis.png)
+
+**Pro tip**: Save these plots for your Week 3 comparison! After optimization, regenerate and compare side-by-side.
 
 ---
 

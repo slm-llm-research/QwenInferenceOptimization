@@ -51,6 +51,16 @@ You will run 4 types of benchmarks:
 3. **Sequence Length Impact**: How prompt/generation length affects speed
 4. **GPU Utilization Analysis**: Resource usage patterns
 
+**🆕 NEW: Enhanced Benchmarking Options**
+
+We now offer two versions of the latency benchmark:
+- **Basic** (`benchmark_latency.py`): 3 test cases, quick baseline (~2-3 min)
+- **Comprehensive** (`benchmark_latency_comprehensive.py`): 9-12 test cases, thorough analysis (~5-15 min)
+
+👉 **See `BENCHMARKING_GUIDE.md` for a detailed comparison and recommendation!**
+
+**Quick Recommendation:** Use `benchmark_latency_comprehensive.py` (standard mode) for your Week 2 baseline. The extra 5 minutes gives you better statistical confidence and tests important edge cases like long prompts.
+
 ## 🚀 Running the Experiments
 
 ### Experiment 1: Basic Latency Test
@@ -58,7 +68,11 @@ You will run 4 types of benchmarks:
 Measure how long it takes to process single requests:
 
 ```bash
+# Quick version (3 test cases, 5 runs) - 2-3 minutes
 python benchmark_latency.py
+
+# OR: Comprehensive version (9 test cases, 10 runs) - 5-8 minutes [RECOMMENDED]
+python benchmark_latency_comprehensive.py
 ```
 
 **What it does**:
@@ -66,6 +80,11 @@ python benchmark_latency.py
 - Measures end-to-end time
 - Calculates tokens per second
 - Repeats multiple times for accuracy
+
+**Which one to use?**
+- **Basic**: Quick baseline, good for first pass or budget-constrained
+- **Comprehensive**: Better statistical confidence, tests long prompts, recommended for proper baseline
+- See `BENCHMARKING_GUIDE.md` for detailed comparison
 
 **Expected output**:
 ```
@@ -151,7 +170,9 @@ python benchmark_throughput.py
 | File | Purpose |
 |------|---------|
 | `README.md` | This guide |
-| `benchmark_latency.py` | Single request latency tests |
+| `BENCHMARKING_GUIDE.md` | 📖 **NEW!** Detailed guide on choosing the right benchmark |
+| `benchmark_latency.py` | Single request latency tests (basic - 3 cases) |
+| `benchmark_latency_comprehensive.py` | 📊 **NEW!** Comprehensive latency tests (9-12 cases) |
 | `benchmark_throughput.py` | Batch throughput tests |
 | `benchmark_sequence_length.py` | Sequence length impact analysis |
 | `run_all_benchmarks.py` | Run complete benchmark suite |

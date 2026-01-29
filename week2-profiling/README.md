@@ -51,46 +51,131 @@ You will run 4 types of benchmarks:
 3. **Sequence Length Impact**: How prompt/generation length affects speed
 4. **GPU Utilization Analysis**: Resource usage patterns
 
-**🆕 NEW: Enhanced Benchmarking Options**
+**🆕 NEW: Production-Grade Benchmarking Options**
 
-We now offer two versions of the latency benchmark:
-- **Basic** (`benchmark_latency.py`): 3 test cases, quick baseline (~2-3 min)
-- **Comprehensive** (`benchmark_latency_comprehensive.py`): 9-12 test cases, thorough analysis (~5-15 min)
+We now offer **production-realistic versions** of both key benchmarks!
 
-👉 **See `BENCHMARKING_GUIDE.md` for a detailed comparison and recommendation!**
+### 📊 Two Testing Approaches
 
-**Quick Recommendation:** Use `benchmark_latency_comprehensive.py` (standard mode) for your Week 2 baseline. The extra 5 minutes gives you better statistical confidence and tests important edge cases like long prompts.
+**1. Systematic Testing** (Good for optimization tracking)
+- Tests controlled scenarios (prompt length × generation length matrices)
+- Consistent conditions for fair comparison
+- Use for: Week 3 optimization comparison, understanding scaling behavior
+
+**2. Production Testing** ⭐ (Essential for SLA validation)
+- Tests realistic mixed workloads (varied use cases, sizes, patterns)
+- Measures P50/P90/P95/P99 latencies
+- Use for: SLA validation, capacity planning, production readiness
+
+### 🎯 Available Benchmarks
+
+**Latency Testing:**
+| Version | Approach | Time | Command |
+|---------|----------|------|---------|
+| Basic | Systematic | 2-3 min | `python benchmark_latency.py` |
+| Comprehensive | Systematic | 5-8 min | `python benchmark_latency_comprehensive.py` |
+| **Production** ⭐ | **Production** | **4-6 min** | `python benchmark_latency_comprehensive.py --production` |
+
+**Throughput Testing:**
+| Version | Approach | Time | Command |
+|---------|----------|------|---------|
+| Basic | Systematic | 3-5 min | `python benchmark_throughput.py` |
+| **Production** ⭐ | **Production** | **3-10 min** | `python benchmark_throughput_production.py` |
+
+### 💡 Quick Recommendations
+
+**For Learning (Week 2):**
+```bash
+# Day 1: Understand basics
+python benchmark_latency.py              # 3 min
+python benchmark_throughput.py           # 5 min
+
+# Day 2: Comprehensive baseline ⭐
+python benchmark_latency_comprehensive.py             # Systematic
+python benchmark_latency_comprehensive.py --production  # Production
+python benchmark_throughput_production.py             # Production
+```
+
+**For Production Deployment:**
+```bash
+# MUST run these for SLA validation:
+python benchmark_latency_comprehensive.py --production
+python benchmark_throughput_production.py --stress
+
+# You need P95/P99 metrics to guarantee SLAs!
+```
+
+**For Week 3 Optimization:**
+```bash
+# Use systematic versions for fair before/after comparison:
+python benchmark_latency_comprehensive.py      # Week 2 baseline
+# ... optimize in Week 3 ...
+python benchmark_latency_comprehensive.py      # Week 3 results
+# → Easy to compare same test matrix!
+```
+
+### 🔑 Key Differences
+
+**Systematic vs Production:**
+- **Systematic**: "Does doubling generation length double latency?" → Optimization insights
+- **Production**: "Can I meet 1.5s P95 SLA?" → Deployment readiness
+
+**Why both matter:**
+- Systematic = understand behavior, track improvements
+- Production = validate real-world performance, set SLAs
+
+**Example:**
+```
+Systematic test: "Average latency: 0.8s" ← Good for comparison
+Production test: "P95: 1.42s, P99: 2.87s" ← Good for SLA validation
+```
 
 ## 🚀 Running the Experiments
 
-### Experiment 1: Basic Latency Test
+### Experiment 1: Latency Testing
 
-Measure how long it takes to process single requests:
+Measure how long it takes to process requests:
 
 ```bash
-# Quick version (3 test cases, 5 runs) - 2-3 minutes
+# Option A: Basic (3 test cases, 5 runs) - 2-3 minutes
 python benchmark_latency.py
 
-# OR: Comprehensive version (9 test cases, 10 runs) - 5-8 minutes [RECOMMENDED]
+# Option B: Comprehensive Systematic (9 test cases, 10 runs) - 5-8 minutes
 python benchmark_latency_comprehensive.py
+
+# Option C: Production Workload (100 mixed requests) - 4-6 minutes ⭐ NEW!
+python benchmark_latency_comprehensive.py --production
 ```
 
-**What it does**:
-- Runs inference on a single prompt
-- Measures end-to-end time
-- Calculates tokens per second
-- Repeats multiple times for accuracy
+**What each does**:
+- **Basic**: Quick baseline with 3 scenarios
+- **Comprehensive (Systematic)**: 3×3 matrix (prompt × generation length) for thorough coverage
+- **Comprehensive (Production)**: Mixed realistic workloads (chat, code, summarization, Q&A) with P50/P90/P95/P99 analysis
 
-**Which one to use?**
-- **Basic**: Quick baseline, good for first pass or budget-constrained
-- **Comprehensive**: Better statistical confidence, tests long prompts, recommended for proper baseline
-- See `BENCHMARKING_GUIDE.md` for detailed comparison
+**Which to use?**
+- **Learning basics**: Start with basic, then try comprehensive
+- **Week 2 baseline**: Use comprehensive systematic (good for Week 3 comparison)
+- **SLA validation**: Use production mode (essential for P95/P99 metrics!)
+- **Both recommended**: Run systematic for optimization tracking, production for SLA planning
 
-**Expected output**:
+**Expected output (systematic)**:
 ```
-Single Request Latency Test
+Test Case: Short prompt, 50 tokens
 Average latency: 1.2s
-Average throughput: 41.7 tokens/sec
+Throughput: 41.7 tokens/sec
+```
+
+**Expected output (production)** ⭐:
+```
+Latency Distribution:
+  P50: 0.45s  |  P90: 1.15s  |  P95: 1.42s  |  P99: 2.87s
+
+By Use Case (P95):
+  chat:    0.89s ✓
+  code:    1.23s ✓
+  summary: 0.67s ✓
+  
+Production insights: P95 < 1.5s for most use cases ✓
 ```
 
 ### Experiment 2: Batch Throughput Test
@@ -98,23 +183,41 @@ Average throughput: 41.7 tokens/sec
 Test performance with multiple simultaneous requests:
 
 ```bash
+# Basic version: Simple batch scaling (3-5 min)
 python benchmark_throughput.py
+
+# OR: Production version: Realistic mixed workloads (3-10 min) [RECOMMENDED for deployment]
+python benchmark_throughput_production.py
 ```
 
 **What it does**:
-- Tests batch sizes: 1, 4, 8, 16, 32
-- Measures total throughput for each batch size
+- **Basic**: Tests batch sizes (1, 4, 8, 16, 32) with uniform prompts
+- **Production**: Tests realistic mixed workloads with various prompt types, lengths, and sustained load
 - Shows GPU utilization improvement with batching
 
-**Expected output**:
+**Which one to use?**
+- **Basic**: Great for learning batching concepts
+- **Production**: Essential for SLA planning, capacity estimation, P95/P99 latency analysis
+- **Both**: Run both to see theory vs practice! (recommended)
+- See `THROUGHPUT_COMPARISON.md` for detailed guide
+
+**Expected output (basic)**:
 ```
 Batch size 1:  Throughput = 42 tokens/sec
 Batch size 4:  Throughput = 150 tokens/sec (3.6x)
-Batch size 8:  Throughput = 280 tokens/sec (6.7x)
 Batch size 16: Throughput = 450 tokens/sec (10.7x)
 ```
 
-**Key insight**: Throughput scales almost linearly with batch size up to GPU saturation!
+**Expected output (production)**:
+```
+Mixed Workload: 380 tokens/sec
+P50 latency: 0.45s  |  P95 latency: 1.23s  |  P99 latency: 2.87s
+Sustained load: 5 req/s stable, breaking point at ~12 req/s
+```
+
+**Key insight**: 
+- Basic: Throughput scales with batch size!
+- Production: Real workload is heterogeneous - P95/P99 matter for SLAs!
 
 ### Experiment 3: Sequence Length Test
 
@@ -169,17 +272,25 @@ python benchmark_throughput.py
 
 | File | Purpose |
 |------|---------|
-| `README.md` | This guide |
-| `BENCHMARKING_GUIDE.md` | 📖 **NEW!** Detailed guide on choosing the right benchmark |
-| `benchmark_latency.py` | Single request latency tests (basic - 3 cases) |
-| `benchmark_latency_comprehensive.py` | 📊 **NEW!** Comprehensive latency tests (9-12 cases) |
-| `benchmark_throughput.py` | Batch throughput tests |
+| `README.md` | This guide (you are here!) |
+| **Latency Benchmarks** | |
+| `benchmark_latency.py` | Basic latency (3 scenarios, quick) |
+| `benchmark_latency_comprehensive.py` | 📊 **ENHANCED!** Systematic OR Production modes:<br>• `--standard`: 9-case matrix<br>• `--production`: 100 mixed requests with P95/P99 ⭐ |
+| **Throughput Benchmarks** | |
+| `benchmark_throughput.py` | Basic batch throughput (simple scaling) |
+| `benchmark_throughput_production.py` | 🏭 **NEW!** Production workload (mixed requests, sustained load, stress test) |
+| **Guides & Documentation** | |
+| `BENCHMARKING_GUIDE.md` | Detailed latency testing strategies |
+| `THROUGHPUT_COMPARISON.md` | Batch vs production throughput explained |
+| `QUICK_COMPARISON.md` | TL;DR decision trees and visuals |
+| `WHATS_NEW.md` | Complete overview of enhancements |
+| **Other Tools** | |
 | `benchmark_sequence_length.py` | Sequence length impact analysis |
 | `run_all_benchmarks.py` | Run complete benchmark suite |
 | `monitor_gpu.py` | Real-time GPU monitoring |
 | `utils.py` | Shared utility functions |
 | `requirements.txt` | Additional dependencies |
-| `results/` | Output directory for results |
+| `results/` | Output directory for all results |
 
 ## 📈 Understanding Your Results
 
@@ -297,12 +408,23 @@ These will be compared against optimized results in Week 3!
 
 After Week 2, you should understand:
 
-1. **Baseline Performance**: Your model's default speed
-2. **Batching Benefits**: Why serving multiple requests together helps
-3. **Scaling Behavior**: How performance changes with load
-4. **Bottlenecks**: Whether you're compute or memory limited
+### Performance Fundamentals
+1. **Baseline Performance**: Your model's default speed and capacity
+2. **Batching Benefits**: Why serving multiple requests together helps GPU utilization
+3. **Scaling Behavior**: How performance changes with load and request size
+4. **Bottlenecks**: Whether you're compute-bound or memory-bound
 
-These insights guide Week 3's optimizations!
+### Production Readiness
+5. **Tail Latency Matters**: P95/P99 > average for user experience and SLAs
+6. **Mixed Workloads**: Real traffic is heterogeneous (chat + code + long form)
+7. **Capacity Limits**: Your system has a breaking point - know it before production!
+8. **Use Case Variance**: Different request types have different performance profiles
+
+### Two Testing Approaches
+- **Systematic**: Controlled tests for optimization comparison
+- **Production**: Realistic tests for SLA validation and capacity planning
+
+**These insights guide Week 3's optimizations and deployment decisions!**
 
 ## 📖 Additional Resources
 
@@ -314,14 +436,130 @@ These insights guide Week 3's optimizations!
 
 Before moving to Week 3, ensure you have:
 
-- [ ] Run `benchmark_latency.py` successfully
-- [ ] Run `benchmark_throughput.py` with multiple batch sizes
-- [ ] Run `benchmark_sequence_length.py` to see scaling
-- [ ] Completed `run_all_benchmarks.py` for full baseline
-- [ ] Monitored GPU utilization with `monitor_gpu.py`
+### Minimum Requirements (Choose Your Path)
+
+**Path A: Quick Learning** (15 min total)
+- [ ] Run `benchmark_latency.py` 
+- [ ] Run `benchmark_throughput.py`
+- [ ] Run `benchmark_sequence_length.py`
 - [ ] Saved results to `results/` directory
-- [ ] Identified 1-2 bottlenecks or optimization opportunities
-- [ ] Understood the difference between latency and throughput
+
+**Path B: Thorough Baseline** ⭐ RECOMMENDED (25 min total)
+- [ ] Run `benchmark_latency_comprehensive.py` (systematic)
+- [ ] Run `benchmark_latency_comprehensive.py --production` (realistic)
+- [ ] Run `benchmark_throughput_production.py` (realistic)
+- [ ] Run `benchmark_sequence_length.py`
+
+**Path C: Production-Ready** (30 min total)
+- [ ] All benchmarks from Path B
+- [ ] Run `benchmark_throughput_production.py --stress` (find limits)
+- [ ] Documented P95/P99 targets for SLA planning
+- [ ] Validated latency stability over time
+
+### Understanding & Analysis (All Paths)
+- [ ] Understand difference between systematic vs production testing
+- [ ] Know what P50/P90/P95/P99 percentiles mean
+- [ ] Identified which use cases have highest latency
+- [ ] Documented baseline metrics for Week 3 comparison
+- [ ] Optional: Monitored GPU utilization with `monitor_gpu.py`
+
+### Key Concepts Learned
+- [ ] Why average latency ≠ P95 latency (tail latency matters!)
+- [ ] How batching improves throughput
+- [ ] That real workloads are heterogeneous (varied sizes/types)
+- [ ] What your system's capacity limits are
+- [ ] Which metrics matter for SLA validation
+
+### Decision Helper
+
+**Not sure which path to choose?**
+
+- **Student on budget** → Path A (quick)
+- **Serious learner** → Path B (recommended) ⭐
+- **Planning production deployment** → Path C (complete)
+- **ML Engineer** → Path B minimum, Path C preferred
+- **Researcher** → Path C + stress modes
+
+## 🎓 What You've Learned
+
+By completing Week 2, you now understand:
+
+### Core Concepts
+- **Latency vs Throughput**: Individual request speed vs total system capacity
+- **Batching Benefits**: How processing multiple requests together improves GPU utilization
+- **Tail Latency**: Why P95/P99 matter more than averages for user experience
+- **Mixed Workloads**: Real production is heterogeneous (not uniform like benchmarks)
+
+### Two Testing Philosophies
+
+**Systematic Testing** (Matrix approach):
+- Controlled variables (prompt length × generation length)
+- Good for: Understanding behavior, comparing optimizations
+- Example: "Doubling output length increases latency by 1.8x"
+
+**Production Testing** (Realistic approach):
+- Mixed use cases, varied sizes, realistic patterns
+- Good for: SLA validation, capacity planning
+- Example: "95% of chat requests complete in < 1.2s"
+
+### Key Metrics You Can Now Measure
+
+1. **Single-request latency** (user experience)
+2. **Batch throughput** (system capacity)
+3. **P50/P90/P95/P99 latencies** (SLA compliance)
+4. **Per-use-case performance** (optimization priorities)
+5. **Breaking points** (capacity limits)
+6. **Sustained load capacity** (production readiness)
+
+### Production Readiness Insights
+
+From your production benchmarks, you now know:
+- ✅ What SLA targets you can realistically meet
+- ✅ Which use cases need optimization (high P95)
+- ✅ Your system's request/second capacity
+- ✅ Where the breaking point is (when latency degrades)
+- ✅ If performance is stable over time
+
+This data is **critical** for Week 3 optimization and eventual deployment!
+
+## 📊 Results Summary Template
+
+Document your findings like this:
+
+```markdown
+## My Week 2 Baseline Results
+
+**Hardware**: Tesla T4 (16GB VRAM)
+**Date**: 2026-01-29
+
+### Systematic Tests
+- Short prompt, 50 tokens: 1.12s avg (σ=0.04s)
+- Medium prompt, 100 tokens: 2.34s avg (σ=0.07s)
+- Long prompt, 200 tokens: 4.67s avg (σ=0.12s)
+
+### Production Tests
+**Latency Distribution**:
+- P50: 0.45s | P95: 1.42s | P99: 2.87s
+
+**By Use Case (P95)**:
+- Chat (quick): 0.89s ✓ Good
+- Chat (detailed): 2.15s ⚠️ Needs optimization
+- Code (simple): 1.01s ✓ Good
+- Code (complex): 1.78s ✓ Acceptable
+
+**Capacity**:
+- Sustained: 5 req/s stable
+- Breaking point: ~12 req/s
+
+**SLA Analysis**:
+- Can meet 1.5s P95 for chat/code ✓
+- Detailed responses exceed 2s (optimize in Week 3)
+
+### Week 3 Goals
+1. Optimize long prompt processing
+2. Target: P95 < 1.5s for all use cases
+3. Increase sustained capacity to 8-10 req/s
+```
 
 ## 🔜 Next Steps
 
@@ -333,9 +571,16 @@ In Week 3, you'll learn:
 - PagedAttention efficiency debugging
 - Reducing memory waste and improving throughput
 
-Your baseline metrics from this week will prove the improvements!
+**Your baseline metrics from this week will prove the improvements!**
+
+Use your **production test results** to prioritize optimizations:
+- High P95 latency → optimize that use case first
+- Low throughput → tune batching parameters  
+- Breaking point too low → increase concurrency limits
 
 ---
 
 **Questions?** Review this README or check the inline comments in the scripts.
+
+**Need help choosing tests?** See the decision helpers in the checklist above!
 

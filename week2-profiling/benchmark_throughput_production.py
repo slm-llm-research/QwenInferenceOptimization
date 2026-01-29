@@ -32,7 +32,7 @@ import threading
 import queue
 from pathlib import Path
 from typing import List, Dict, Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from collections import defaultdict
 import argparse
 
@@ -331,7 +331,7 @@ def benchmark_mixed_workload(llm, num_requests: int = 100, batch_size: int = 16)
             wtype: calculate_percentiles(times)
             for wtype, times in by_type.items()
         },
-        "all_results": all_results,
+        "all_results": [asdict(result) for result in all_results],  # Convert dataclasses to dicts
     }
 
 

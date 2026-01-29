@@ -1,0 +1,55 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "prompt": "Write a short sentence about machine learning:",
+  "max_tokens": 50,
+  "batch_sizes": [
+    1,
+    4,
+    8,
+    16,
+    32
+  ],
+  "results": [
+    {
+      "batch_size": 1,
+      "elapsed_time": 0.21511626616120338,
+      "total_tokens": 18,
+      "throughput": 83.67568069683395,
+      "tokens_per_request": 18.0,
+      "latency_per_request": 0.21511626616120338
+    },
+    {
+      "batch_size": 4,
+      "elapsed_time": 0.5158974528312683,
+      "total_tokens": 184,
+      "throughput": 356.6600280544123,
+      "tokens_per_request": 46.0,
+      "latency_per_request": 0.12897436320781708
+    },
+    {
+      "batch_size": 8,
+      "elapsed_time": 0.5168659165501595,
+      "total_tokens": 172,
+      "throughput": 332.7748928542635,
+      "tokens_per_request": 21.5,
+      "latency_per_request": 0.06460823956876993
+    },
+    {
+      "batch_size": 16,
+      "elapsed_time": 0.5218693092465401,
+      "total_tokens": 316,
+      "throughput": 605.5155848429404,
+      "tokens_per_request": 19.75,
+      "latency_per_request": 0.032616831827908754
+    },
+    {
+      "batch_size": 32,
+      "elapsed_time": 0.5604938939213753,
+      "total_tokens": 1382,
+      "throughput": 2465.682525693783,
+      "tokens_per_request": 43.1875,
+      "latency_per_request": 0.017515434185042977
+    }
+  ],
+  "timestamp": "2026-01-29 22:22:01"
+}

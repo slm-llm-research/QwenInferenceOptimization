@@ -1,0 +1,454 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "mode": "stress",
+  "num_runs_per_case": 15,
+  "total_test_cases": 12,
+  "total_time_seconds": 196.48830103874207,
+  "test_cases": [
+    {
+      "test_case": "Short prompt, 10 tokens",
+      "prompt_length": "short",
+      "max_tokens": 10,
+      "result": {
+        "prompt": "The capital of France is",
+        "prompt_length_words": 5,
+        "max_tokens": 10,
+        "num_runs": 15,
+        "latencies": [
+          0.1054145060479641,
+          0.10500762984156609,
+          0.10491307079792023,
+          0.10536180436611176,
+          0.10508011281490326,
+          0.10513497516512871,
+          0.10511240735650063,
+          0.10497216507792473,
+          0.10478348657488823,
+          0.10420891642570496,
+          0.10427291691303253,
+          0.10458559542894363,
+          0.10424929484724998,
+          0.10414449498057365,
+          0.10447103530168533
+        ],
+        "latency_stats": {
+          "mean": 0.10478082746267318,
+          "median": 0.10491307079792023,
+          "stdev": 0.000428964955890194,
+          "min": 0.10414449498057365,
+          "max": 0.1054145060479641
+        },
+        "avg_tokens_generated": 8.0,
+        "throughput_tokens_per_sec": 76.34984561321485
+      }
+    },
+    {
+      "test_case": "Short prompt, 20 tokens",
+      "prompt_length": "short",
+      "max_tokens": 20,
+      "result": {
+        "prompt": "The capital of France is",
+        "prompt_length_words": 5,
+        "max_tokens": 20,
+        "num_runs": 15,
+        "latencies": [
+          0.2060542330145836,
+          0.2061188742518425,
+          0.20615585520863533,
+          0.2060728333890438,
+          0.20624244213104248,
+          0.20606332272291183,
+          0.2062586024403572,
+          0.20627674087882042,
+          0.20613650977611542,
+          0.20609106123447418,
+          0.206130038946867,
+          0.2058531418442726,
+          0.20568491145968437,
+          0.20592615008354187,
+          0.2057957611978054
+        ],
+        "latency_stats": {
+          "mean": 0.20605736523866652,
+          "median": 0.20609106123447418,
+          "stdev": 0.00017225553840725507,
+          "min": 0.20568491145968437,
+          "max": 0.20627674087882042
+        },
+        "avg_tokens_generated": 16.0,
+        "throughput_tokens_per_sec": 77.6482800382697
+      }
+    },
+    {
+      "test_case": "Short prompt, 50 tokens",
+      "prompt_length": "short",
+      "max_tokens": 50,
+      "result": {
+        "prompt": "The capital of France is",
+        "prompt_length_words": 5,
+        "max_tokens": 50,
+        "num_runs": 15,
+        "latencies": [
+          0.5123095661401749,
+          0.5119854062795639,
+          0.5116974003612995,
+          0.5120198726654053,
+          0.5134592317044735,
+          0.5123527944087982,
+          0.5117889046669006,
+          0.5121701620519161,
+          0.5126170329749584,
+          0.5131126902997494,
+          0.5128983221948147,
+          0.5126922987401485,
+          0.5123094543814659,
+          0.5133832208812237,
+          0.5134902037680149
+        ],
+        "latency_stats": {
+          "mean": 0.5125524374345939,
+          "median": 0.5123527944087982,
+          "stdev": 0.0006019240146627413,
+          "min": 0.5116974003612995,
+          "max": 0.5134902037680149
+        },
+        "avg_tokens_generated": 40.0,
+        "throughput_tokens_per_sec": 78.04079559197169
+      }
+    },
+    {
+      "test_case": "Short prompt, 100 tokens",
+      "prompt_length": "short",
+      "max_tokens": 100,
+      "result": {
+        "prompt": "The capital of France is",
+        "prompt_length_words": 5,
+        "max_tokens": 100,
+        "num_runs": 15,
+        "latencies": [
+          1.0221908874809742,
+          1.0227961279451847,
+          1.0223726332187653,
+          1.022684182971716,
+          1.0235916338860989,
+          1.022551104426384,
+          1.0219946578145027,
+          1.0229902975261211,
+          1.0229036547243595,
+          1.0222436264157295,
+          1.0226718559861183,
+          1.0235196389257908,
+          1.0226408690214157,
+          1.0226041786372662,
+          1.0225765369832516
+        ],
+        "latency_stats": {
+          "mean": 1.0226887923975785,
+          "median": 1.0226408690214157,
+          "stdev": 0.00044103820489528367,
+          "min": 1.0219946578145027,
+          "max": 1.0235916338860989
+        },
+        "avg_tokens_generated": 81.0,
+        "throughput_tokens_per_sec": 79.20298002885573
+      }
+    },
+    {
+      "test_case": "Medium prompt, 20 tokens",
+      "prompt_length": "medium",
+      "max_tokens": 20,
+      "result": {
+        "prompt": "Write a short story about a robot learning to paint. Include details about the robot's journey and emotions.",
+        "prompt_length_words": 18,
+        "max_tokens": 20,
+        "num_runs": 15,
+        "latencies": [
+          0.206814993172884,
+          0.20708802342414856,
+          0.2066950537264347,
+          0.2063574492931366,
+          0.20656856521964073,
+          0.2065279632806778,
+          0.20675641298294067,
+          0.20678619295358658,
+          0.2072126641869545,
+          0.20696353167295456,
+          0.20700957998633385,
+          0.20708098262548447,
+          0.20700155198574066,
+          0.2068781852722168,
+          0.2062341570854187
+        ],
+        "latency_stats": {
+          "mean": 0.20679835379123687,
+          "median": 0.206814993172884,
+          "stdev": 0.000281131219083637,
+          "min": 0.2062341570854187,
+          "max": 0.2072126641869545
+        },
+        "avg_tokens_generated": 16.0,
+        "throughput_tokens_per_sec": 77.37005496742017
+      }
+    },
+    {
+      "test_case": "Medium prompt, 50 tokens",
+      "prompt_length": "medium",
+      "max_tokens": 50,
+      "result": {
+        "prompt": "Write a short story about a robot learning to paint. Include details about the robot's journey and emotions.",
+        "prompt_length_words": 18,
+        "max_tokens": 50,
+        "num_runs": 15,
+        "latencies": [
+          0.5128199569880962,
+          0.5140770860016346,
+          0.5138172544538975,
+          0.513558279722929,
+          0.5132675617933273,
+          0.5124229788780212,
+          0.5123243592679501,
+          0.5126254335045815,
+          0.5127754099667072,
+          0.5124946720898151,
+          0.5129875056445599,
+          0.5128883495926857,
+          0.5132947824895382,
+          0.5128862075507641,
+          0.5127094648778439
+        ],
+        "latency_stats": {
+          "mean": 0.5129966201881567,
+          "median": 0.5128862075507641,
+          "stdev": 0.000512413590584421,
+          "min": 0.5123243592679501,
+          "max": 0.5140770860016346
+        },
+        "avg_tokens_generated": 40.0,
+        "throughput_tokens_per_sec": 77.97322326476306
+      }
+    },
+    {
+      "test_case": "Medium prompt, 100 tokens",
+      "prompt_length": "medium",
+      "max_tokens": 100,
+      "result": {
+        "prompt": "Write a short story about a robot learning to paint. Include details about the robot's journey and emotions.",
+        "prompt_length_words": 18,
+        "max_tokens": 100,
+        "num_runs": 15,
+        "latencies": [
+          1.0240152478218079,
+          1.0225718282163143,
+          1.0232306309044361,
+          1.023685846477747,
+          1.0250426568090916,
+          1.0245468989014626,
+          1.024522002786398,
+          1.022616308182478,
+          1.0223057754337788,
+          1.023087926208973,
+          1.022649597376585,
+          1.0222201980650425,
+          1.0228631347417831,
+          1.0231496393680573,
+          1.0223759077489376
+        ],
+        "latency_stats": {
+          "mean": 1.0232589066028595,
+          "median": 1.023087926208973,
+          "stdev": 0.0009028671682811595,
+          "min": 1.0222201980650425,
+          "max": 1.0250426568090916
+        },
+        "avg_tokens_generated": 83.0,
+        "throughput_tokens_per_sec": 81.11339120961438
+      }
+    },
+    {
+      "test_case": "Medium prompt, 200 tokens",
+      "prompt_length": "medium",
+      "max_tokens": 200,
+      "result": {
+        "prompt": "Write a short story about a robot learning to paint. Include details about the robot's journey and emotions.",
+        "prompt_length_words": 18,
+        "max_tokens": 200,
+        "num_runs": 15,
+        "latencies": [
+          2.0419885739684105,
+          2.0417477525770664,
+          2.042148433625698,
+          2.041861116886139,
+          2.042165856808424,
+          2.0419594682753086,
+          2.0412289202213287,
+          2.040857460349798,
+          2.0409676544368267,
+          2.0417500399053097,
+          2.0412587486207485,
+          2.041192825883627,
+          2.040584485977888,
+          2.040296420454979,
+          2.040802326053381
+        ],
+        "latency_stats": {
+          "mean": 2.041387338936329,
+          "median": 2.0412587486207485,
+          "stdev": 0.0006019833908221629,
+          "min": 2.040296420454979,
+          "max": 2.042165856808424
+        },
+        "avg_tokens_generated": 168.0,
+        "throughput_tokens_per_sec": 82.29697362948126
+      }
+    },
+    {
+      "test_case": "Long prompt, 50 tokens",
+      "prompt_length": "long",
+      "max_tokens": 50,
+      "result": {
+        "prompt": "You are an expert AI researcher writing a comprehensive review paper. Explain the evolution of large language models from early neural networks to modern transformer architectures. Discuss the key innovations that made models like GPT, BERT, and modern LLMs possible. Include details about: 1) The attention mechanism and how it revolutionized NLP 2) The scaling laws discovered by researchers 3) The architectural improvements like layer normalization and positional encodings 4) The training methodologies including pre-training and fine-tuning 5) The computational challenges and how they were addressed Please provide a thorough, academic-level explanation suitable for publication.",
+        "prompt_length_words": 95,
+        "max_tokens": 50,
+        "num_runs": 15,
+        "latencies": [
+          0.5129760690033436,
+          0.5127477273344994,
+          0.5152294896543026,
+          0.5127242431044579,
+          0.5128599666059017,
+          0.5129787996411324,
+          0.5130110941827297,
+          0.512641403824091,
+          0.513340450823307,
+          0.5122992694377899,
+          0.5130381807684898,
+          0.5138334520161152,
+          0.5127928629517555,
+          0.5126322917640209,
+          0.5127093829214573
+        ],
+        "latency_stats": {
+          "mean": 0.513054312268893,
+          "median": 0.5128599666059017,
+          "stdev": 0.0006959582011853524,
+          "min": 0.5122992694377899,
+          "max": 0.5152294896543026
+        },
+        "avg_tokens_generated": 34.0,
+        "throughput_tokens_per_sec": 66.26978701268672
+      }
+    },
+    {
+      "test_case": "Long prompt, 100 tokens",
+      "prompt_length": "long",
+      "max_tokens": 100,
+      "result": {
+        "prompt": "You are an expert AI researcher writing a comprehensive review paper. Explain the evolution of large language models from early neural networks to modern transformer architectures. Discuss the key innovations that made models like GPT, BERT, and modern LLMs possible. Include details about: 1) The attention mechanism and how it revolutionized NLP 2) The scaling laws discovered by researchers 3) The architectural improvements like layer normalization and positional encodings 4) The training methodologies including pre-training and fine-tuning 5) The computational challenges and how they were addressed Please provide a thorough, academic-level explanation suitable for publication.",
+        "prompt_length_words": 95,
+        "max_tokens": 100,
+        "num_runs": 15,
+        "latencies": [
+          1.0224706418812275,
+          1.0228713229298592,
+          1.0229069292545319,
+          1.0231943354010582,
+          1.0229499153792858,
+          1.0227904878556728,
+          1.022977277636528,
+          1.0233032554388046,
+          1.023317363113165,
+          1.0230521261692047,
+          1.0234862752258778,
+          1.0230464562773705,
+          1.0226588621735573,
+          1.0227375365793705,
+          1.023016344755888
+        ],
+        "latency_stats": {
+          "mean": 1.0229852753380935,
+          "median": 1.022977277636528,
+          "stdev": 0.0002681185021615308,
+          "min": 1.0224706418812275,
+          "max": 1.0234862752258778
+        },
+        "avg_tokens_generated": 74.0,
+        "throughput_tokens_per_sec": 72.33730707956009
+      }
+    },
+    {
+      "test_case": "Long prompt, 200 tokens",
+      "prompt_length": "long",
+      "max_tokens": 200,
+      "result": {
+        "prompt": "You are an expert AI researcher writing a comprehensive review paper. Explain the evolution of large language models from early neural networks to modern transformer architectures. Discuss the key innovations that made models like GPT, BERT, and modern LLMs possible. Include details about: 1) The attention mechanism and how it revolutionized NLP 2) The scaling laws discovered by researchers 3) The architectural improvements like layer normalization and positional encodings 4) The training methodologies including pre-training and fine-tuning 5) The computational challenges and how they were addressed Please provide a thorough, academic-level explanation suitable for publication.",
+        "prompt_length_words": 95,
+        "max_tokens": 200,
+        "num_runs": 15,
+        "latencies": [
+          2.042572595179081,
+          2.042206209152937,
+          2.0425256565213203,
+          2.0437390357255936,
+          2.044376105070114,
+          2.0432030707597733,
+          2.0450773872435093,
+          2.0446708872914314,
+          2.051764629781246,
+          2.0459992922842503,
+          2.0454686507582664,
+          2.044735476374626,
+          2.045676823705435,
+          2.045871026813984,
+          2.043764755129814
+        ],
+        "latency_stats": {
+          "mean": 2.044776773452759,
+          "median": 2.0446708872914314,
+          "stdev": 0.0023019562416331848,
+          "min": 2.042206209152937,
+          "max": 2.051764629781246
+        },
+        "avg_tokens_generated": 152.0,
+        "throughput_tokens_per_sec": 74.33574264604766
+      }
+    },
+    {
+      "test_case": "Long prompt, 300 tokens",
+      "prompt_length": "long",
+      "max_tokens": 300,
+      "result": {
+        "prompt": "You are an expert AI researcher writing a comprehensive review paper. Explain the evolution of large language models from early neural networks to modern transformer architectures. Discuss the key innovations that made models like GPT, BERT, and modern LLMs possible. Include details about: 1) The attention mechanism and how it revolutionized NLP 2) The scaling laws discovered by researchers 3) The architectural improvements like layer normalization and positional encodings 4) The training methodologies including pre-training and fine-tuning 5) The computational challenges and how they were addressed Please provide a thorough, academic-level explanation suitable for publication.",
+        "prompt_length_words": 95,
+        "max_tokens": 300,
+        "num_runs": 15,
+        "latencies": [
+          3.0640621185302734,
+          3.0647616013884544,
+          3.0642512030899525,
+          3.064699314534664,
+          3.0644517950713634,
+          3.063383113592863,
+          3.0628992430865765,
+          3.063784323632717,
+          3.0632216334342957,
+          3.0642341934144497,
+          3.0664055980741978,
+          3.0651870630681515,
+          3.0648688711225986,
+          3.0639329627156258,
+          3.063813854008913
+        ],
+        "latency_stats": {
+          "mean": 3.06426379258434,
+          "median": 3.0642341934144497,
+          "stdev": 0.0008695604074714615,
+          "min": 3.0628992430865765,
+          "max": 3.0664055980741978
+        },
+        "avg_tokens_generated": 224.0,
+        "throughput_tokens_per_sec": 73.10075605830359
+      }
+    }
+  ],
+  "timestamp": "2026-01-29 22:36:24"
+}

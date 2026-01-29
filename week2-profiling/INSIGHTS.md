@@ -11,6 +11,32 @@ This guide will help you understand **what these numbers mean** and **how to use
 
 ---
 
+## 📈 Visual Overview: Generate Your Plots First!
+
+Before diving into the analysis, **generate visualizations** from your results:
+
+```bash
+python generate_insights_plots.py
+```
+
+**This creates 8 plots in `results/` folder:**
+1. `latency_scaling.png` - How output length affects latency
+2. `percentile_distribution.png` - P50/P90/P95/P99 visualization
+3. `use_case_performance.png` - Which workloads are slowest
+4. `queue_time_breakdown.png` - Where time is spent (critical!)
+5. `throughput_analysis.png` - Batch scaling benefits
+6. `sequence_length_impact.png` - Sequence length categories
+7. `consistency_analysis.png` - Performance predictability
+8. `comprehensive_dashboard.png` - Complete overview
+
+**Time**: ~10 seconds
+
+**Then**: Open the plots and read this guide together for maximum understanding! 📊
+
+---
+
+---
+
 ## 🎯 Quick Performance Summary (YOUR Results)
 
 Based on your actual benchmark data:
@@ -59,6 +85,9 @@ Short prompt (5 words):
 - This is GOOD - means consistent, predictable performance
 
 #### From Production Testing (Realistic Mix)
+
+**📊 See: `results/use_case_performance.png`** - Which workloads need optimization!
+
 ```
 By Use Case (P95 latency):
   • Ultra-short Q&A:     0.279s  ✓ Excellent
@@ -73,9 +102,17 @@ By Use Case (P95 latency):
 - Typical requests: 1-2 seconds ✓
 - Long responses: 4+ seconds ⚠️ **← Optimization target!**
 
+**In the plot**, you'll see:
+- Bar chart comparing P50/P95/P99 across all use cases
+- Color coding: Green (fast), Orange (OK), Red (slow)
+- SLA reference lines showing which use cases meet targets
+- Clear visual of which categories need Week 3 optimization
+
 ---
 
 ### 2. **Percentiles (P50, P90, P95, P99)**
+
+**📊 See: `results/percentile_distribution.png`** - Visual breakdown of tail latency!
 
 **What they are**: 
 - **P50 (Median)**: 50% of requests complete by this time
@@ -100,6 +137,11 @@ Overall Latency Distribution:
 - **P50 to P95 gap**: 2.544s / 0.850s = **3x difference**
 - This means: While most users get fast responses, some wait 3x longer!
 
+**In the plot**, you'll see:
+- Left panel: Bar chart showing the dramatic increase from P50 → P99
+- Right panel: Cumulative distribution curve showing exactly where latency jumps
+- SLA reference lines (1.5s, 2.0s) showing which percentiles meet targets
+
 **Why this happens**:
 - Long prompts take longer
 - Longer outputs take longer
@@ -117,6 +159,8 @@ If you promise **"95% of requests complete in < 2s"**:
 ---
 
 ### 3. **Throughput (Tokens Per Second)**
+
+**📊 See: `results/throughput_analysis.png`** - Batching benefits visualized!
 
 **What it is**: Total tokens generated per second (system capacity).
 
@@ -137,6 +181,11 @@ Batch Processing (Mixed Workload):
 - This is **MUCH faster** than single-request mode (~100 tokens/sec)
 - **Batching gives you 9-10x speedup!** ← Key insight
 
+**In the plot**, you'll see:
+- Left panel: Throughput scaling with batch size (exponential curve!)
+- Speedup annotations showing 2x, 4x, 8x, 10x improvements
+- Right panel: Your system's capacity metrics (949 tok/s, 4.6 req/s)
+
 #### Throughput by Use Case:
 
 Looking at individual request types in your production test:
@@ -156,6 +205,8 @@ Long-form               ~400 tokens           91 tok/s
 
 ### 4. **Queue Time vs Generation Time**
 
+**📊 See: `results/queue_time_breakdown.png`** - The shocking truth about where time goes!
+
 **Your Results**:
 
 ```
@@ -173,6 +224,12 @@ From Production Throughput Test:
 
 **Critical Insight**: Most time is spent **WAITING**, not generating!
 
+**In the plot**, you'll see:
+- Stacked bars showing queue (red) vs generation (green) time
+- Percentages showing 85% waiting, 15% working
+- Pie chart dramatically illustrating the imbalance
+- **This is your #1 optimization target!**
+
 **Why this happens**:
 - You're processing requests **sequentially** in the production test
 - Each request waits for previous ones to complete
@@ -186,6 +243,8 @@ From Production Throughput Test:
 ---
 
 ### 5. **Standard Deviation (Consistency)**
+
+**📊 See: `results/consistency_analysis.png`** - Your system's predictability!
 
 **What it is**: How much latency varies between requests.
 
@@ -216,11 +275,18 @@ Short prompt, 20 tokens:
 - Users will get predictable response times
 - This is a STRENGTH of your setup
 
+**In the plot**, you'll see:
+- Top panel: Error bars showing mean ± std dev (tiny error bars = good!)
+- Bottom panel: Coefficient of variation bars (all green = excellent!)
+- Your system has rock-solid consistency across all test cases
+
 ---
 
 ## 🔬 Deep Dive: Understanding Scaling Relationships
 
 ### How Does Output Length Affect Latency?
+
+**📊 See: `results/latency_scaling.png`** - Visual proof of linear scaling!
 
 From your systematic tests:
 
@@ -234,6 +300,11 @@ Output Tokens    Latency    Latency/Token    Scaling
 ```
 
 **Key Finding**: **Perfect linear scaling** at ~10ms per token!
+
+**In the plot**, you'll see:
+- Left panel: Latency increases linearly with output tokens (straight line!)
+- Right panel: Throughput stays constant ~100 tok/s (flat line = consistent)
+- Red dashed line: Linear fit showing the 10ms/token rate
 
 **What this means**:
 - Predictable: You can estimate latency for any output length
@@ -279,6 +350,8 @@ Very long prompts (200+ words) → noticeable slowdown
 
 ### Sequence Length Categories (Production Test)
 
+**📊 See: `results/sequence_length_impact.png`** - Dramatic scaling visualization!
+
 From your sequence length production benchmark:
 
 ```
@@ -299,6 +372,12 @@ Very Long     500+ tokens       4.396s         15.8x
 - Memory bandwidth limitations
 
 **Action**: If many requests exceed 300 tokens, optimize these first in Week 3.
+
+**In the plot**, you'll see:
+- Three lines showing P50/P95/P99 climbing steeply with sequence length
+- The gap between tiny and very_long is dramatic (15x!)
+- SLA reference line showing where you exceed targets
+- Clear visual of which sequence categories need optimization
 
 ---
 
@@ -591,5 +670,81 @@ LLaMA-2-7B:      ~0.8-1.2s typical
 
 ---
 
-**Questions?** Review your actual results in the `results/` folder and refer back to this guide! 🎓
+## 📊 Visual Summary: Your Complete Performance Dashboard
+
+**📊 See: `results/comprehensive_dashboard.png`** - Everything at a glance!
+
+This single dashboard shows:
+- **Top row**: Output scaling (linear fit) + Percentile comparison
+- **Middle row**: Use case performance (which workloads are slow?)
+- **Bottom row**: Time allocation pie chart + Key metrics (949 tok/s, 4.6 req/s)
+
+**Perfect for**:
+- Quick reference during Week 3 optimization
+- Presentations or reports
+- Comparing before/after optimization
+
+---
+
+## 🎯 How to Use These Visualizations
+
+### Step 1: Generate All Plots
+```bash
+python generate_insights_plots.py
+```
+
+### Step 2: Review in Order
+
+1. **Start with**: `comprehensive_dashboard.png` - Get the big picture
+2. **Then**: `percentile_distribution.png` - Understand tail latency
+3. **Critical**: `queue_time_breakdown.png` - See the 85% waiting problem!
+4. **Deep dive**: `use_case_performance.png` - Find optimization targets
+5. **Understand**: `latency_scaling.png` - Confirm linear behavior
+6. **Validate**: `consistency_analysis.png` - Check predictability
+
+### Step 3: Document Insights
+
+Create your optimization plan based on what the plots reveal:
+```markdown
+## Week 3 Optimization Plan (Based on Plots)
+
+From queue_time_breakdown.png:
+  → 85% time wasted in queue - PRIORITY #1
+
+From use_case_performance.png:
+  → Long-form content exceeds SLA - PRIORITY #2
+
+From sequence_length_impact.png:
+  → Very long sequences 15x slower - PRIORITY #3
+```
+
+---
+
+## 📁 Complete Results Package
+
+After generating plots, you have:
+
+```
+results/
+├── JSON Data (Raw Numbers):
+│   ├── latency_benchmark_comprehensive.json
+│   ├── throughput_production_benchmark.json
+│   └── sequence_length_production_benchmark.json
+│
+└── Visualizations (Understanding):
+    ├── comprehensive_dashboard.png ⭐ START HERE
+    ├── percentile_distribution.png
+    ├── use_case_performance.png
+    ├── queue_time_breakdown.png ⭐ CRITICAL
+    ├── latency_scaling.png
+    ├── throughput_analysis.png
+    ├── sequence_length_impact.png
+    └── consistency_analysis.png
+```
+
+**Use both**: Numbers for precision, plots for understanding!
+
+---
+
+**Questions?** Review your actual results in the `results/` folder, look at the plots, and refer back to this guide! 🎓
 

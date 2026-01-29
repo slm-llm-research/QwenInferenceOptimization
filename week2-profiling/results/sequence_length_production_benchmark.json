@@ -1,0 +1,1162 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "mode": "production",
+  "num_requests": 100,
+  "results": {
+    "num_requests": 100,
+    "total_time": 113.42197108268738,
+    "overall_percentiles": {
+      "p50": 0.8502032496035099,
+      "p90": 2.329049523919821,
+      "p95": 2.5437030233442783,
+      "p99": 4.395909391343594,
+      "min": 0.09565940871834755,
+      "max": 4.395909391343594,
+      "mean": 1.1341595159098505
+    },
+    "by_category": {
+      "short_qa": {
+        "p50": 0.7263090461492538,
+        "p90": 0.8498132899403572,
+        "p95": 0.8502032496035099,
+        "p99": 0.872058030217886,
+        "min": 0.5538219884037971,
+        "max": 0.872058030217886,
+        "mean": 0.7195143237976092
+      },
+      "medium_explain": {
+        "p50": 1.4827868267893791,
+        "p90": 1.7461783289909363,
+        "p95": 1.817459374666214,
+        "p99": 1.8791812136769295,
+        "min": 1.143917415291071,
+        "max": 1.8791812136769295,
+        "mean": 1.505477293677952
+      },
+      "ultra_short": {
+        "p50": 0.20759355276823044,
+        "p90": 0.2789897248148918,
+        "p95": 0.27916237339377403,
+        "p99": 0.2909618616104126,
+        "min": 0.09565940871834755,
+        "max": 0.2909618616104126,
+        "mean": 0.20649318972771818
+      },
+      "code_short": {
+        "p50": 0.5441088862717152,
+        "p90": 0.5441088862717152,
+        "p95": 0.5441088862717152,
+        "p99": 0.5441088862717152,
+        "min": 0.47370726242661476,
+        "max": 0.5441088862717152,
+        "mean": 0.508908074349165
+      },
+      "summarization": {
+        "p50": 1.003209114074707,
+        "p90": 1.0947168469429016,
+        "p95": 1.0947168469429016,
+        "p99": 1.0947168469429016,
+        "min": 0.9421950094401836,
+        "max": 1.0947168469429016,
+        "mean": 1.0153567514249258
+      },
+      "long_context": {
+        "p50": 2.329049523919821,
+        "p90": 2.7473755441606045,
+        "p95": 2.7473755441606045,
+        "p99": 2.7473755441606045,
+        "min": 1.921989694237709,
+        "max": 2.7473755441606045,
+        "mean": 2.2950711570680142
+      },
+      "code_long": {
+        "p50": 2.289668772369623,
+        "p90": 2.4598871730268,
+        "p95": 2.4598871730268,
+        "p99": 2.4598871730268,
+        "min": 2.127419166266918,
+        "max": 2.4598871730268,
+        "mean": 2.302538336068392
+      },
+      "long_form": {
+        "p50": 3.5818612053990364,
+        "p90": 4.395909391343594,
+        "p95": 4.395909391343594,
+        "p99": 4.395909391343594,
+        "min": 3.5342353396117687,
+        "max": 4.395909391343594,
+        "mean": 3.837335312118133
+      }
+    },
+    "by_sequence_length": {
+      "short": {
+        "p50": 0.9421950094401836,
+        "p90": 1.6340342611074448,
+        "p95": 2.1965631619095802,
+        "p99": 2.4598871730268,
+        "min": 0.5441088862717152,
+        "max": 2.4598871730268,
+        "mean": 1.086046945619381
+      },
+      "tiny": {
+        "p50": 0.20759355276823044,
+        "p90": 0.27916237339377403,
+        "p95": 0.2909618616104126,
+        "p99": 0.47370726242661476,
+        "min": 0.09565940871834755,
+        "max": 0.47370726242661476,
+        "mean": 0.21811119288853978
+      },
+      "medium": {
+        "p50": 2.1335425972938538,
+        "p90": 2.5437030233442783,
+        "p95": 2.7473755441606045,
+        "p99": 2.7473755441606045,
+        "min": 1.7461783289909363,
+        "max": 2.7473755441606045,
+        "mean": 2.1873745617767173
+      },
+      "long": {
+        "p50": 3.5818612053990364,
+        "p90": 4.395909391343594,
+        "p95": 4.395909391343594,
+        "p99": 4.395909391343594,
+        "min": 3.5342353396117687,
+        "max": 4.395909391343594,
+        "mean": 3.837335312118133
+      }
+    },
+    "by_prompt_length": {
+      "0-20": {
+        "p50": 0.7263090461492538,
+        "p90": 1.6340342611074448,
+        "p95": 1.817459374666214,
+        "p99": 2.289668772369623,
+        "min": 0.09565940871834755,
+        "max": 2.289668772369623,
+        "mean": 0.8409108192502678
+      },
+      "20-50": {
+        "p50": 2.4391534067690372,
+        "p90": 3.5818612053990364,
+        "p95": 4.395909391343594,
+        "p99": 4.395909391343594,
+        "min": 0.9421950094401836,
+        "max": 4.395909391343594,
+        "mean": 2.128279625955555
+      },
+      "50-100": {
+        "p50": 2.112505178898573,
+        "p90": 2.2080005817115307,
+        "p95": 2.2080005817115307,
+        "p99": 2.2080005817115307,
+        "min": 1.921989694237709,
+        "max": 2.2080005817115307,
+        "mean": 2.0713570483028887
+      }
+    },
+    "all_results": [
+      {
+        "request_id": 0,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 48,
+        "total_sequence": 55,
+        "latency": 0.7482974529266357,
+        "throughput": 64.145614571143
+      },
+      {
+        "request_id": 1,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 116,
+        "total_sequence": 130,
+        "latency": 1.4219821691513062,
+        "throughput": 81.57626903945868
+      },
+      {
+        "request_id": 2,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 18,
+        "total_sequence": 21,
+        "latency": 0.2276543825864792,
+        "throughput": 79.06722372525523
+      },
+      {
+        "request_id": 3,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 117,
+        "total_sequence": 131,
+        "latency": 1.379681907594204,
+        "throughput": 84.80215574038851
+      },
+      {
+        "request_id": 4,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 12,
+        "total_sequence": 15,
+        "latency": 0.14601567015051842,
+        "throughput": 82.18296014140093
+      },
+      {
+        "request_id": 5,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 4,
+        "output_tokens": 56,
+        "total_sequence": 60,
+        "latency": 0.7162788510322571,
+        "throughput": 78.18184205675797
+      },
+      {
+        "request_id": 6,
+        "category": "code_short",
+        "sequence_category": "short",
+        "prompt_length": 10,
+        "output_tokens": 46,
+        "total_sequence": 56,
+        "latency": 0.5441088862717152,
+        "throughput": 84.54190174175667
+      },
+      {
+        "request_id": 7,
+        "category": "summarization",
+        "sequence_category": "short",
+        "prompt_length": 32,
+        "output_tokens": 89,
+        "total_sequence": 121,
+        "latency": 1.026339303702116,
+        "throughput": 86.71596194257343
+      },
+      {
+        "request_id": 8,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 4,
+        "output_tokens": 18,
+        "total_sequence": 22,
+        "latency": 0.2274068482220173,
+        "throughput": 79.15328909719817
+      },
+      {
+        "request_id": 9,
+        "category": "medium_explain",
+        "sequence_category": "medium",
+        "prompt_length": 12,
+        "output_tokens": 139,
+        "total_sequence": 151,
+        "latency": 1.817459374666214,
+        "throughput": 76.48038901861456
+      },
+      {
+        "request_id": 10,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 106,
+        "total_sequence": 118,
+        "latency": 1.3312250226736069,
+        "throughput": 79.62590711156528
+      },
+      {
+        "request_id": 11,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 58,
+        "total_sequence": 65,
+        "latency": 0.821103673428297,
+        "throughput": 70.63663441893596
+      },
+      {
+        "request_id": 12,
+        "category": "code_short",
+        "sequence_category": "tiny",
+        "prompt_length": 8,
+        "output_tokens": 39,
+        "total_sequence": 47,
+        "latency": 0.47370726242661476,
+        "throughput": 82.3293267665318
+      },
+      {
+        "request_id": 13,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 123,
+        "total_sequence": 135,
+        "latency": 1.6340342611074448,
+        "throughput": 75.27381948322088
+      },
+      {
+        "request_id": 14,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 13,
+        "total_sequence": 16,
+        "latency": 0.1560043953359127,
+        "throughput": 83.33098546363429
+      },
+      {
+        "request_id": 15,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 8,
+        "output_tokens": 50,
+        "total_sequence": 58,
+        "latency": 0.5538219884037971,
+        "throughput": 90.2817169540486
+      },
+      {
+        "request_id": 16,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 50,
+        "output_tokens": 157,
+        "total_sequence": 207,
+        "latency": 1.921989694237709,
+        "throughput": 81.68618201788466
+      },
+      {
+        "request_id": 17,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 131,
+        "total_sequence": 145,
+        "latency": 1.5215583927929401,
+        "throughput": 86.09593993927449
+      },
+      {
+        "request_id": 18,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 131,
+        "total_sequence": 143,
+        "latency": 1.6039844267070293,
+        "throughput": 81.67161589526292
+      },
+      {
+        "request_id": 19,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 12,
+        "total_sequence": 15,
+        "latency": 0.13602015748620033,
+        "throughput": 88.2222181018827
+      },
+      {
+        "request_id": 20,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 124,
+        "total_sequence": 136,
+        "latency": 1.6447572782635689,
+        "throughput": 75.3910632521483
+      },
+      {
+        "request_id": 21,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 70,
+        "total_sequence": 75,
+        "latency": 0.8502032496035099,
+        "throughput": 82.33325388093297
+      },
+      {
+        "request_id": 22,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 16,
+        "total_sequence": 19,
+        "latency": 0.20759355276823044,
+        "throughput": 77.07368454676111
+      },
+      {
+        "request_id": 23,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 4,
+        "output_tokens": 52,
+        "total_sequence": 56,
+        "latency": 0.6583670601248741,
+        "throughput": 78.98329541295251
+      },
+      {
+        "request_id": 24,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 4,
+        "output_tokens": 22,
+        "total_sequence": 26,
+        "latency": 0.27916237339377403,
+        "throughput": 78.807182116079
+      },
+      {
+        "request_id": 25,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 50,
+        "output_tokens": 156,
+        "total_sequence": 206,
+        "latency": 2.1335425972938538,
+        "throughput": 73.11782769084036
+      },
+      {
+        "request_id": 26,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 50,
+        "total_sequence": 57,
+        "latency": 0.7065020352602005,
+        "throughput": 70.77120447584457
+      },
+      {
+        "request_id": 27,
+        "category": "code_long",
+        "sequence_category": "medium",
+        "prompt_length": 19,
+        "output_tokens": 173,
+        "total_sequence": 192,
+        "latency": 2.127419166266918,
+        "throughput": 81.31918840590836
+      },
+      {
+        "request_id": 28,
+        "category": "summarization",
+        "sequence_category": "short",
+        "prompt_length": 32,
+        "output_tokens": 96,
+        "total_sequence": 128,
+        "latency": 1.0947168469429016,
+        "throughput": 87.69390940505657
+      },
+      {
+        "request_id": 29,
+        "category": "medium_explain",
+        "sequence_category": "medium",
+        "prompt_length": 14,
+        "output_tokens": 141,
+        "total_sequence": 155,
+        "latency": 1.7461783289909363,
+        "throughput": 80.7477665133318
+      },
+      {
+        "request_id": 30,
+        "category": "long_form",
+        "sequence_category": "long",
+        "prompt_length": 43,
+        "output_tokens": 266,
+        "total_sequence": 309,
+        "latency": 3.5342353396117687,
+        "throughput": 75.26380516279364
+      },
+      {
+        "request_id": 31,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 53,
+        "total_sequence": 60,
+        "latency": 0.7376919351518154,
+        "throughput": 71.84570885825492
+      },
+      {
+        "request_id": 32,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 19,
+        "total_sequence": 22,
+        "latency": 0.23834721744060516,
+        "throughput": 79.71563588626621
+      },
+      {
+        "request_id": 33,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 46,
+        "total_sequence": 51,
+        "latency": 0.5940405838191509,
+        "throughput": 77.43578680140176
+      },
+      {
+        "request_id": 34,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 53,
+        "total_sequence": 58,
+        "latency": 0.6648846045136452,
+        "throughput": 79.71308049577843
+      },
+      {
+        "request_id": 35,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 50,
+        "output_tokens": 155,
+        "total_sequence": 205,
+        "latency": 2.112505178898573,
+        "throughput": 73.37260118851617
+      },
+      {
+        "request_id": 36,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 19,
+        "total_sequence": 22,
+        "latency": 0.23722375184297562,
+        "throughput": 80.09316037028442
+      },
+      {
+        "request_id": 37,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 133,
+        "total_sequence": 145,
+        "latency": 1.74521229788661,
+        "throughput": 76.20849346584268
+      },
+      {
+        "request_id": 38,
+        "category": "summarization",
+        "sequence_category": "short",
+        "prompt_length": 32,
+        "output_tokens": 88,
+        "total_sequence": 120,
+        "latency": 1.003209114074707,
+        "throughput": 87.71850132279282
+      },
+      {
+        "request_id": 39,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 56,
+        "total_sequence": 63,
+        "latency": 0.7678721472620964,
+        "throughput": 72.92880748399593
+      },
+      {
+        "request_id": 40,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 4,
+        "output_tokens": 67,
+        "total_sequence": 71,
+        "latency": 0.8496911451220512,
+        "throughput": 78.85218103617638
+      },
+      {
+        "request_id": 41,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 52,
+        "total_sequence": 59,
+        "latency": 0.7263090461492538,
+        "throughput": 71.59486760586786
+      },
+      {
+        "request_id": 42,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 4,
+        "output_tokens": 20,
+        "total_sequence": 24,
+        "latency": 0.2571740075945854,
+        "throughput": 77.76835686881866
+      },
+      {
+        "request_id": 43,
+        "category": "code_long",
+        "sequence_category": "short",
+        "prompt_length": 22,
+        "output_tokens": 104,
+        "total_sequence": 126,
+        "latency": 2.4391534067690372,
+        "throughput": 42.637744600804325
+      },
+      {
+        "request_id": 44,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 115,
+        "total_sequence": 127,
+        "latency": 1.4299713671207428,
+        "throughput": 80.4211906924775
+      },
+      {
+        "request_id": 45,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 36,
+        "output_tokens": 151,
+        "total_sequence": 187,
+        "latency": 2.5437030233442783,
+        "throughput": 59.36227563289838
+      },
+      {
+        "request_id": 46,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 12,
+        "total_sequence": 15,
+        "latency": 0.1360679604113102,
+        "throughput": 88.19122417743347
+      },
+      {
+        "request_id": 47,
+        "category": "long_form",
+        "sequence_category": "long",
+        "prompt_length": 43,
+        "output_tokens": 270,
+        "total_sequence": 313,
+        "latency": 3.5818612053990364,
+        "throughput": 75.3798052233352
+      },
+      {
+        "request_id": 48,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 119,
+        "total_sequence": 133,
+        "latency": 1.4005762040615082,
+        "throughput": 84.96503057449772
+      },
+      {
+        "request_id": 49,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 112,
+        "total_sequence": 126,
+        "latency": 1.297514345496893,
+        "throughput": 86.31889149334125
+      },
+      {
+        "request_id": 50,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 66,
+        "total_sequence": 71,
+        "latency": 0.7986423298716545,
+        "throughput": 82.64024774470256
+      },
+      {
+        "request_id": 51,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 63,
+        "total_sequence": 68,
+        "latency": 0.7571920081973076,
+        "throughput": 83.20214597878268
+      },
+      {
+        "request_id": 52,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 125,
+        "total_sequence": 139,
+        "latency": 1.460227258503437,
+        "throughput": 85.6031136743129
+      },
+      {
+        "request_id": 53,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 55,
+        "total_sequence": 60,
+        "latency": 0.686170008033514,
+        "throughput": 80.15506267553694
+      },
+      {
+        "request_id": 54,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 5,
+        "output_tokens": 8,
+        "total_sequence": 13,
+        "latency": 0.09565940871834755,
+        "throughput": 83.63003814454473
+      },
+      {
+        "request_id": 55,
+        "category": "long_form",
+        "sequence_category": "long",
+        "prompt_length": 43,
+        "output_tokens": 341,
+        "total_sequence": 384,
+        "latency": 4.395909391343594,
+        "throughput": 77.57211753988737
+      },
+      {
+        "request_id": 56,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 119,
+        "total_sequence": 131,
+        "latency": 1.5726143196225166,
+        "throughput": 75.67017450824449
+      },
+      {
+        "request_id": 57,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 36,
+        "output_tokens": 149,
+        "total_sequence": 185,
+        "latency": 2.510545291006565,
+        "throughput": 59.34965624151744
+      },
+      {
+        "request_id": 58,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 63,
+        "total_sequence": 68,
+        "latency": 0.7678478583693504,
+        "throughput": 82.04750369922334
+      },
+      {
+        "request_id": 59,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 123,
+        "total_sequence": 137,
+        "latency": 1.4477688819169998,
+        "throughput": 84.95831174181264
+      },
+      {
+        "request_id": 60,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 100,
+        "total_sequence": 114,
+        "latency": 1.143917415291071,
+        "throughput": 87.41889813309197
+      },
+      {
+        "request_id": 61,
+        "category": "code_long",
+        "sequence_category": "short",
+        "prompt_length": 22,
+        "output_tokens": 112,
+        "total_sequence": 134,
+        "latency": 2.4598871730268,
+        "throughput": 45.530543525778114
+      },
+      {
+        "request_id": 62,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 36,
+        "output_tokens": 140,
+        "total_sequence": 176,
+        "latency": 2.329049523919821,
+        "throughput": 60.11035770694054
+      },
+      {
+        "request_id": 63,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 50,
+        "total_sequence": 57,
+        "latency": 0.7066619358956814,
+        "throughput": 70.7551906508533
+      },
+      {
+        "request_id": 64,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 110,
+        "total_sequence": 122,
+        "latency": 1.379979569464922,
+        "throughput": 79.71132503262479
+      },
+      {
+        "request_id": 65,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 50,
+        "output_tokens": 157,
+        "total_sequence": 207,
+        "latency": 2.2080005817115307,
+        "throughput": 71.1050537306931
+      },
+      {
+        "request_id": 66,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 16,
+        "total_sequence": 19,
+        "latency": 0.17821485921740532,
+        "throughput": 89.77927020373485
+      },
+      {
+        "request_id": 67,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 36,
+        "output_tokens": 165,
+        "total_sequence": 201,
+        "latency": 2.7473755441606045,
+        "throughput": 60.057315553637515
+      },
+      {
+        "request_id": 68,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 4,
+        "output_tokens": 20,
+        "total_sequence": 24,
+        "latency": 0.2586400769650936,
+        "throughput": 77.32753653139078
+      },
+      {
+        "request_id": 69,
+        "category": "summarization",
+        "sequence_category": "short",
+        "prompt_length": 32,
+        "output_tokens": 83,
+        "total_sequence": 115,
+        "latency": 0.9520041234791279,
+        "throughput": 87.18449631990457
+      },
+      {
+        "request_id": 70,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 4,
+        "output_tokens": 56,
+        "total_sequence": 60,
+        "latency": 0.7072372287511826,
+        "throughput": 79.18135206044379
+      },
+      {
+        "request_id": 71,
+        "category": "code_long",
+        "sequence_category": "medium",
+        "prompt_length": 19,
+        "output_tokens": 131,
+        "total_sequence": 150,
+        "latency": 2.289668772369623,
+        "throughput": 57.21351558829425
+      },
+      {
+        "request_id": 72,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 4,
+        "output_tokens": 69,
+        "total_sequence": 73,
+        "latency": 0.872058030217886,
+        "throughput": 79.12317484509623
+      },
+      {
+        "request_id": 73,
+        "category": "summarization",
+        "sequence_category": "short",
+        "prompt_length": 32,
+        "output_tokens": 82,
+        "total_sequence": 114,
+        "latency": 0.9421950094401836,
+        "throughput": 87.03081546645134
+      },
+      {
+        "request_id": 74,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 132,
+        "total_sequence": 144,
+        "latency": 1.6145059689879417,
+        "throughput": 81.75875626074311
+      },
+      {
+        "request_id": 75,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 15,
+        "total_sequence": 18,
+        "latency": 0.17707233503460884,
+        "throughput": 84.71114359602389
+      },
+      {
+        "request_id": 76,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 4,
+        "output_tokens": 23,
+        "total_sequence": 27,
+        "latency": 0.2909618616104126,
+        "throughput": 79.0481607201021
+      },
+      {
+        "request_id": 77,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 8,
+        "output_tokens": 55,
+        "total_sequence": 63,
+        "latency": 0.6169315688312054,
+        "throughput": 89.15089254420727
+      },
+      {
+        "request_id": 78,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 8,
+        "output_tokens": 58,
+        "total_sequence": 66,
+        "latency": 0.6460911072790623,
+        "throughput": 89.77062111914877
+      },
+      {
+        "request_id": 79,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 54,
+        "total_sequence": 59,
+        "latency": 0.6760465987026691,
+        "throughput": 79.87615070266723
+      },
+      {
+        "request_id": 80,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 4,
+        "output_tokens": 22,
+        "total_sequence": 26,
+        "latency": 0.27707435190677643,
+        "throughput": 79.40106996046336
+      },
+      {
+        "request_id": 81,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 36,
+        "output_tokens": 145,
+        "total_sequence": 181,
+        "latency": 2.4632529467344284,
+        "throughput": 58.865249787777046
+      },
+      {
+        "request_id": 82,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 101,
+        "total_sequence": 115,
+        "latency": 1.1585940159857273,
+        "throughput": 87.17462597462976
+      },
+      {
+        "request_id": 83,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 16,
+        "total_sequence": 19,
+        "latency": 0.20756042748689651,
+        "throughput": 77.08598500072995
+      },
+      {
+        "request_id": 84,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 8,
+        "output_tokens": 54,
+        "total_sequence": 62,
+        "latency": 0.6042063757777214,
+        "throughput": 89.3734362377298
+      },
+      {
+        "request_id": 85,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 4,
+        "output_tokens": 22,
+        "total_sequence": 26,
+        "latency": 0.2789897248148918,
+        "throughput": 78.85595075086326
+      },
+      {
+        "request_id": 86,
+        "category": "long_context",
+        "sequence_category": "medium",
+        "prompt_length": 50,
+        "output_tokens": 151,
+        "total_sequence": 201,
+        "latency": 1.980747189372778,
+        "throughput": 76.23385801588115
+      },
+      {
+        "request_id": 87,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 58,
+        "total_sequence": 63,
+        "latency": 0.7288181036710739,
+        "throughput": 79.58089914047503
+      },
+      {
+        "request_id": 88,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 5,
+        "output_tokens": 70,
+        "total_sequence": 75,
+        "latency": 0.8498132899403572,
+        "throughput": 82.371034706827
+      },
+      {
+        "request_id": 89,
+        "category": "code_long",
+        "sequence_category": "short",
+        "prompt_length": 22,
+        "output_tokens": 105,
+        "total_sequence": 127,
+        "latency": 2.1965631619095802,
+        "throughput": 47.80194889033755
+      },
+      {
+        "request_id": 90,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 12,
+        "output_tokens": 120,
+        "total_sequence": 132,
+        "latency": 1.4827868267893791,
+        "throughput": 80.9286930743992
+      },
+      {
+        "request_id": 91,
+        "category": "summarization",
+        "sequence_category": "short",
+        "prompt_length": 32,
+        "output_tokens": 96,
+        "total_sequence": 128,
+        "latency": 1.0945444665849209,
+        "throughput": 87.70772036290933
+      },
+      {
+        "request_id": 92,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 14,
+        "total_sequence": 17,
+        "latency": 0.16624731943011284,
+        "throughput": 84.21188412535776
+      },
+      {
+        "request_id": 93,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 8,
+        "output_tokens": 51,
+        "total_sequence": 59,
+        "latency": 0.5640093944966793,
+        "throughput": 90.42402573012508
+      },
+      {
+        "request_id": 94,
+        "category": "medium_explain",
+        "sequence_category": "short",
+        "prompt_length": 14,
+        "output_tokens": 130,
+        "total_sequence": 144,
+        "latency": 1.5122669078409672,
+        "throughput": 85.96366112751774
+      },
+      {
+        "request_id": 95,
+        "category": "summarization",
+        "sequence_category": "short",
+        "prompt_length": 32,
+        "output_tokens": 87,
+        "total_sequence": 119,
+        "latency": 0.9944883957505226,
+        "throughput": 87.48216708385286
+      },
+      {
+        "request_id": 96,
+        "category": "short_qa",
+        "sequence_category": "short",
+        "prompt_length": 7,
+        "output_tokens": 56,
+        "total_sequence": 63,
+        "latency": 0.7696114555001259,
+        "throughput": 72.7639896726964
+      },
+      {
+        "request_id": 97,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 14,
+        "total_sequence": 17,
+        "latency": 0.16646234691143036,
+        "throughput": 84.10310355319562
+      },
+      {
+        "request_id": 98,
+        "category": "medium_explain",
+        "sequence_category": "medium",
+        "prompt_length": 12,
+        "output_tokens": 142,
+        "total_sequence": 154,
+        "latency": 1.8791812136769295,
+        "throughput": 75.56482523691979
+      },
+      {
+        "request_id": 99,
+        "category": "ultra_short",
+        "sequence_category": "tiny",
+        "prompt_length": 3,
+        "output_tokens": 15,
+        "total_sequence": 18,
+        "latency": 0.1972971446812153,
+        "throughput": 76.02745607006321
+      }
+    ]
+  },
+  "timestamp": "2026-01-29 23:07:03"
+}

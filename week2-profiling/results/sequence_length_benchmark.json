@@ -1,0 +1,64 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "prompt_length_experiment": [
+    {
+      "prompt_words": 14,
+      "output_tokens": 50,
+      "elapsed_time": 0.513345867395401,
+      "generated_tokens": 44,
+      "throughput": 85.71219287932693
+    },
+    {
+      "prompt_words": 54,
+      "output_tokens": 50,
+      "elapsed_time": 0.5141220688819885,
+      "generated_tokens": 45,
+      "throughput": 87.52785130943151
+    },
+    {
+      "prompt_words": 104,
+      "output_tokens": 50,
+      "elapsed_time": 0.5149588845670223,
+      "generated_tokens": 45,
+      "throughput": 87.38561727668029
+    },
+    {
+      "prompt_words": 204,
+      "output_tokens": 50,
+      "elapsed_time": 0.5145046971738338,
+      "generated_tokens": 45,
+      "throughput": 87.46275835222552
+    }
+  ],
+  "output_length_experiment": [
+    {
+      "output_tokens": 25,
+      "elapsed_time": 0.2586042098701,
+      "generated_tokens": 21,
+      "throughput": 81.20517454278315,
+      "time_per_token": 0.012314486184290476
+    },
+    {
+      "output_tokens": 50,
+      "elapsed_time": 0.5134874060750008,
+      "generated_tokens": 44,
+      "throughput": 85.68856700172563,
+      "time_per_token": 0.011670168319886381
+    },
+    {
+      "output_tokens": 100,
+      "elapsed_time": 1.0228399969637394,
+      "generated_tokens": 82,
+      "throughput": 80.16894161688417,
+      "time_per_token": 0.012473658499557798
+    },
+    {
+      "output_tokens": 200,
+      "elapsed_time": 2.0426953360438347,
+      "generated_tokens": 168,
+      "throughput": 82.24427648881402,
+      "time_per_token": 0.01215890080978473
+    }
+  ],
+  "timestamp": "2026-01-29 22:58:35"
+}

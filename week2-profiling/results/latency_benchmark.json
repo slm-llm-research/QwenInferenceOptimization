@@ -1,0 +1,78 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "test_cases": [
+    {
+      "test_case": "Short prompt, short generation",
+      "result": {
+        "prompt": "The capital of France is",
+        "max_tokens": 20,
+        "num_runs": 5,
+        "latencies": [
+          0.20684859156608582,
+          0.20619847998023033,
+          0.2067808136343956,
+          0.20674493163824081,
+          0.20661168918013573
+        ],
+        "latency_stats": {
+          "mean": 0.20663690119981765,
+          "median": 0.20674493163824081,
+          "stdev": 0.0002598283026075475,
+          "min": 0.20619847998023033,
+          "max": 0.20684859156608582
+        },
+        "avg_tokens_generated": 16.0,
+        "throughput_tokens_per_sec": 77.4305068799305
+      }
+    },
+    {
+      "test_case": "Short prompt, medium generation",
+      "result": {
+        "prompt": "Explain artificial intelligence in simple terms:",
+        "max_tokens": 50,
+        "num_runs": 5,
+        "latencies": [
+          0.5130891464650631,
+          0.5132879540324211,
+          0.5242322310805321,
+          0.512899074703455,
+          0.5169843211770058
+        ],
+        "latency_stats": {
+          "mean": 0.5160985454916954,
+          "median": 0.5132879540324211,
+          "stdev": 0.004851132857384482,
+          "min": 0.512899074703455,
+          "max": 0.5242322310805321
+        },
+        "avg_tokens_generated": 42.0,
+        "throughput_tokens_per_sec": 81.37980695137577
+      }
+    },
+    {
+      "test_case": "Medium prompt, medium generation",
+      "result": {
+        "prompt": "Write a short story about a robot learning to paint. Include details about the robot's journey and emotions.",
+        "max_tokens": 100,
+        "num_runs": 5,
+        "latencies": [
+          1.0233570635318756,
+          1.023502379655838,
+          1.0230405516922474,
+          1.0229651406407356,
+          1.0230757482349873
+        ],
+        "latency_stats": {
+          "mean": 1.0231881767511368,
+          "median": 1.0230757482349873,
+          "stdev": 0.00022990467906807164,
+          "min": 1.0229651406407356,
+          "max": 1.023502379655838
+        },
+        "avg_tokens_generated": 83.0,
+        "throughput_tokens_per_sec": 81.11899832887488
+      }
+    }
+  ],
+  "timestamp": "2026-01-29 22:09:32"
+}

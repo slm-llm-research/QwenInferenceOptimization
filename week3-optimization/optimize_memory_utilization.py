@@ -72,22 +72,37 @@ def test_memory_utilization(mem_util: float, test_prompts: list, max_tokens: int
         # Warmup
         _ = llm.generate(test_prompts[:2], sampling_params)
         
-        # Benchmark
+        # Benchmark - run multiple times to get latency distribution
         print(f"   Running benchmark with {len(test_prompts)} prompts...")
-        start = time.perf_counter()
-        outputs = llm.generate(test_prompts, sampling_params)
-        elapsed = time.perf_counter() - start
         
-        # Count tokens
-        total_tokens = sum(
-            len(output.outputs[0].text.split())
-            for output in outputs
-        )
+        # Run 3 times for statistics
+        all_latencies = []
+        all_tokens = []
         
-        throughput = total_tokens / elapsed
+        for run in range(3):
+            start = time.perf_counter()
+            outputs = llm.generate(test_prompts, sampling_params)
+            elapsed = time.perf_counter() - start
+            all_latencies.append(elapsed)
+            
+            # Count tokens
+            total_tokens = sum(
+                len(output.outputs[0].text.split())
+                for output in outputs
+            )
+            all_tokens.append(total_tokens)
         
-        print(f"   ⏱️  Time: {elapsed:.2f}s")
+        # Calculate statistics
+        avg_elapsed = sum(all_latencies) / len(all_latencies)
+        avg_tokens = sum(all_tokens) / len(all_tokens)
+        throughput = avg_tokens / avg_elapsed
+        
+        # Estimate per-request latencies (for percentiles)
+        avg_latency_per_request = avg_elapsed / len(test_prompts)
+        
+        print(f"   ⏱️  Time: {avg_elapsed:.2f}s (avg of {len(all_latencies)} runs)")
         print(f"   📈 Throughput: {throughput:.1f} tokens/sec")
+        print(f"   📊 Avg latency per request: {avg_latency_per_request:.3f}s")
         
         # Clean up
         del llm
@@ -97,9 +112,10 @@ def test_memory_utilization(mem_util: float, test_prompts: list, max_tokens: int
         return {
             "mem_utilization": mem_util,
             "success": True,
-            "elapsed_time": elapsed,
-            "total_tokens": total_tokens,
+            "elapsed_time": avg_elapsed,
+            "total_tokens": avg_tokens,
             "throughput": throughput,
+            "avg_latency_per_request": avg_latency_per_request,
             "memory_reserved_gb": reserved if torch.cuda.is_available() else None,
         }
         
@@ -161,6 +177,10 @@ def run_optimization():
     print(f"   Batch size: {len(test_prompts)}")
     print(f"   Max tokens: 50")
     print()
+    print(f"💡 Week 2 Context:")
+    print(f"   Higher memory allows more concurrent sequences")
+    print(f"   This can help reduce the 85% queue time bottleneck")
+    print()
     
     input("Press Enter to start optimization...")
     
@@ -180,7 +200,7 @@ def run_optimization():
     print("="*70)
     print()
     
-    print(f"{'Memory Util':<15} {'Status':<12} {'Throughput':<20} {'Memory Used':<15}")
+    print(f"{'Memory Util':<15} {'Status':<12} {'Throughput':<15} {'Avg Latency':<15} {'Memory':<12}")
     print("-" * 70)
     
     successful_results = []
@@ -191,14 +211,16 @@ def run_optimization():
         if result["success"]:
             status = "✅ Success"
             throughput = f"{result['throughput']:.1f} tok/s"
+            latency = f"{result.get('avg_latency_per_request', 0):.3f}s"
             memory = f"{result['memory_reserved_gb']:.2f} GB" if result['memory_reserved_gb'] else "N/A"
             successful_results.append(result)
         else:
             status = f"❌ {result['error']}"
             throughput = "N/A"
+            latency = "N/A"
             memory = "N/A"
         
-        print(f"{mem_util:<15.2f} {status:<12} {throughput:<20} {memory:<15}")
+        print(f"{mem_util:<15.2f} {status:<12} {throughput:<15} {latency:<15} {memory:<12}")
     
     print()
     

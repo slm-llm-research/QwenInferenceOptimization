@@ -112,6 +112,8 @@ def test_max_num_seqs(max_seqs: int, batch_size: int, max_tokens: int = 50):
             "elapsed_time": elapsed,
             "total_tokens": total_tokens,
             "throughput": throughput,
+            "estimated_queue_time": estimated_queue_time,
+            "queue_time_percentage": queue_time_pct,
             "peak_memory_gb": mem_peak if torch.cuda.is_available() else None,
         }
         
@@ -161,8 +163,9 @@ def run_optimization():
     print("         We're finding the sweet spot.")
     print()
     
-    # Test configuration
-    test_values = [64, 128, 256, 512, 1024]
+    # Test configuration - UPDATED based on Week 2 findings
+    # Week 2 showed 85% queue time - test aggressive values
+    test_values = [256, 512, 1024, 2048, 4096]
     batch_size = 32  # Test with moderate batch
     max_tokens = 50
     
@@ -170,6 +173,10 @@ def run_optimization():
     print(f"   max_num_seqs values: {test_values}")
     print(f"   Batch size: {batch_size}")
     print(f"   Max tokens: {max_tokens}")
+    print()
+    print(f"💡 Week 2 Context:")
+    print(f"   Baseline max_num_seqs likely around 256 (default)")
+    print(f"   Queue time was 85% - testing higher values to reduce it")
     print()
     
     input("Press Enter to start optimization...")
@@ -195,7 +202,7 @@ def run_optimization():
     print("="*70)
     print()
     
-    print(f"{'max_num_seqs':<15} {'Status':<12} {'Throughput':<20} {'Peak Memory':<15}")
+    print(f"{'max_num_seqs':<15} {'Status':<12} {'Throughput':<15} {'Queue %':<12} {'Memory':<12}")
     print("-" * 70)
     
     successful_results = []
@@ -206,14 +213,16 @@ def run_optimization():
         if result["success"]:
             status = "✅ Success"
             throughput = f"{result['throughput']:.1f} tok/s"
+            queue_pct = f"{result.get('queue_time_percentage', 0):.1f}%"
             memory = f"{result['peak_memory_gb']:.2f} GB" if result['peak_memory_gb'] else "N/A"
             successful_results.append(result)
         else:
             status = f"❌ {result['error']}"
             throughput = "N/A"
+            queue_pct = "N/A"
             memory = "N/A"
         
-        print(f"{max_seqs:<15} {status:<12} {throughput:<20} {memory:<15}")
+        print(f"{max_seqs:<15} {status:<12} {throughput:<15} {queue_pct:<12} {memory:<12}")
     
     print()
     

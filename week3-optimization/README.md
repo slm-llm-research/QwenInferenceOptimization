@@ -9,6 +9,50 @@ By the end of this week, you will:
 - Understand PagedAttention and KV cache efficiency
 - Achieve measurable performance improvements over baseline
 
+## 📊 Week 2 Context: What We're Optimizing
+
+Week 2 benchmarking revealed three critical bottlenecks (see [`../week2-profiling/INSIGHTS.md`](../week2-profiling/INSIGHTS.md)):
+
+### **1. Queue Time Dominance (85%) - PRIMARY TARGET** ⚠️
+
+Your Week 2 measurements showed:
+- Queue time: **10.47s (85%)** - Requests waiting to be processed
+- Generation time: **1.78s (15%)** - Actual token generation
+- **Total latency (P50): 12.25s**
+
+**This means**: Your GPU spends most of its time idle while requests queue up. This is a **configuration issue**, not a hardware limitation!
+
+**Week 3 Solution**: Increase `max_num_seqs` to allow more concurrent processing.
+
+### **2. Long Sequence Performance Issues**
+
+Week 2 results:
+- Very long sequences (500+ tokens): **4.4s at P95**
+- Super-linear scaling: **15.8x slower** than short sequences
+- Cannot meet < 3s SLA targets for long-form content
+
+**Week 3 Solution**: Enable chunked prefill for efficient long prompt handling.
+
+### **3. Tail Latency Gap (P95 = 3x P50)**
+
+Week 2 distribution:
+- P50: 0.850s (good!)
+- P95: 2.544s (3x higher)
+- P99: 4.396s (5x higher)
+
+5% of users experience much slower responses than median users.
+
+**Week 3 Solution**: Reducing queue time will improve tail latencies most.
+
+### **4. Limited Request Capacity**
+
+Current capacity:
+- Throughput: **949 tokens/second**
+- Request rate: **4.6 requests/second**
+- Daily capacity: ~400,000 requests
+
+**Week 3 Target**: Increase to 10-15 req/s through better GPU utilization.
+
 ## 📚 What You'll Learn
 
 - **GPU Profiling**: Using PyTorch Profiler and Nsight Systems
@@ -62,7 +106,30 @@ vLLM's key innovation - manages KV cache like OS manages memory:
 - Eliminates fragmentation
 - Enables efficient memory use
 
-## 🚀 Running the Experiments
+## 🚀 Quick Start: Run All Optimizations
+
+**Recommended**: Run the full optimization suite to automatically execute all experiments:
+
+```bash
+python run_full_optimization_suite.py
+```
+
+This will:
+1. Profile your baseline
+2. Optimize memory utilization
+3. Optimize max_num_seqs (addresses 85% queue time!)
+4. Optimize queue time directly
+5. Test chunked prefill for long sequences
+6. Run comprehensive benchmark with optimal settings
+7. Generate before/after visualizations
+
+**Estimated time**: 2-3 hours
+
+---
+
+## 🔬 Individual Experiments
+
+You can also run optimizations individually:
 
 ### Experiment 1: Profile Baseline with PyTorch Profiler
 
@@ -109,7 +176,7 @@ python optimize_memory_utilization.py
 - Higher values → more memory → higher throughput
 - Until OOM limit is reached
 
-### Experiment 3: Tune `max_num_seqs`
+### Experiment 3: Tune `max_num_seqs` ⭐ CRITICAL
 
 Find the optimal concurrent sequence limit:
 
@@ -118,13 +185,32 @@ python optimize_max_num_seqs.py
 ```
 
 **What it does**:
-- Tests max_num_seqs: 64, 128, 256, 512, 1024
-- Measures throughput at each level
-- Identifies the sweet spot before OOM
+- Tests max_num_seqs: **256, 512, 1024, 2048, 4096** (updated for Week 2 findings!)
+- Measures throughput AND queue time at each level
+- Identifies optimal value to reduce 85% queue time
 
 **Key insight**:
+- **THIS IS YOUR PRIMARY BOTTLENECK** (85% queue time)
+- Higher values allow more concurrent requests = less waiting
 - Throughput improves until memory limit
-- Beyond that, either OOM or swapping to CPU (slower)
+
+**Week 2 Baseline**: Default (~256) caused 85% queue time
+**Week 3 Goal**: Find value that reduces queue time to <50%
+
+### Experiment 3B: Optimize Queue Time Directly ⭐ NEW
+
+Specifically target the queue time bottleneck:
+
+```bash
+python optimize_queue_time.py
+```
+
+**What it does**:
+- Tests aggressive max_num_seqs values
+- Measures queue time percentage directly
+- Compares against Week 2 baseline (85%)
+
+**Target**: Reduce queue time from 85% to below 50%
 
 ### Experiment 4: PagedAttention Analysis
 
@@ -144,36 +230,77 @@ python analyze_paged_attention.py
 - Minimal fragmentation
 - Efficient memory sharing
 
-### Experiment 5: Combined Optimization
+### Experiment 5: Chunked Prefill for Long Sequences ⭐ NEW
 
-Apply all optimizations together:
+Optimize handling of long sequences (300+ tokens):
 
 ```bash
-python run_optimized_benchmark.py
+python optimize_chunked_prefill.py
 ```
 
 **What it does**:
-- Uses best parameters from previous experiments
-- Runs same benchmarks as Week 2
-- Compares against baseline
+- Tests chunked prefill with different chunk sizes
+- Measures latency for 100, 200, 300, 400, 500 token sequences
+- Compares against Week 2 baseline (4.4s for 500+ tokens)
+
+**Target**: Reduce long sequence P95 from 4.4s to <3.0s
+
+### Experiment 6: Comprehensive Optimized Benchmark
+
+Apply all optimizations and run full benchmark suite:
+
+```bash
+python run_comprehensive_optimized_benchmark.py
+```
+
+**What it does**:
+- Loads optimal parameters from all experiments
+- Runs ALL Week 2 benchmarks with optimized config
+- Enables direct before/after comparison
 
 **Expected improvements**:
-- 1.5x - 3x throughput increase
-- Better GPU utilization
-- Lower latency variance
+- 2-3x throughput increase (949 → 1900+ tok/s)
+- Queue time reduction (85% → <50%)
+- Long sequence improvement (4.4s → <3.0s)
+- Better tail latencies (P95/P99)
+
+### Experiment 7: Compare Week 2 vs Week 3 ⭐ NEW
+
+Generate detailed comparison report:
+
+```bash
+python compare_week2_week3.py
+```
+
+Shows improvement percentages for all metrics.
+
+### Experiment 8: Visualize Results ⭐ NEW
+
+Generate before/after comparison plots:
+
+```bash
+python visualize_optimization_results.py
+```
+
+Creates visual dashboard showing optimization impact.
 
 ## 📂 Files in This Week
 
-| File | Purpose |
-|------|---------|
-| `README.md` | This guide |
-| `profile_baseline.py` | PyTorch Profiler integration |
-| `optimize_memory_utilization.py` | Tune GPU memory parameter |
-| `optimize_max_num_seqs.py` | Tune concurrent sequences |
-| `analyze_paged_attention.py` | KV cache efficiency analysis |
-| `run_optimized_benchmark.py` | Full optimized benchmark |
-| `compare_results.py` | Compare Week 2 vs Week 3 results |
-| `requirements.txt` | Additional dependencies |
+| File | Purpose | Priority |
+|------|---------|----------|
+| `README.md` | This guide | - |
+| **`run_full_optimization_suite.py`** | **Master script - runs everything** | ⭐ START HERE |
+| `optimize_queue_time.py` | Target 85% queue bottleneck | ⭐ HIGH |
+| `optimize_max_num_seqs.py` | Tune concurrent sequences (updated) | ⭐ HIGH |
+| `optimize_memory_utilization.py` | Tune GPU memory parameter (updated) | HIGH |
+| `optimize_chunked_prefill.py` | Optimize long sequences | HIGH |
+| `profile_baseline.py` | PyTorch Profiler integration | MEDIUM |
+| `run_comprehensive_optimized_benchmark.py` | Full optimized benchmark (Week 2 replica) | ⭐ HIGH |
+| `run_optimized_benchmark.py` | Simple optimized benchmark | MEDIUM |
+| `compare_week2_week3.py` | Detailed before/after comparison | ⭐ HIGH |
+| `visualize_optimization_results.py` | Generate comparison plots | ⭐ HIGH |
+| `OPTIMIZATION_RESULTS.md` | Document your improvements | - |
+| `requirements.txt` | Additional dependencies | - |
 
 ## 📊 Understanding Profiler Output
 
@@ -210,16 +337,19 @@ When viewing in TensorBoard:
 
 ## 🧪 Expected Results
 
-### Typical Improvements (Qwen2.5-7B on A100)
+### Typical Improvements Based on Week 2 Findings
 
-| Metric | Baseline (Week 2) | Optimized (Week 3) | Improvement |
-|--------|-------------------|--------------------|-----------| 
-| Single request | 42 tok/s | 45 tok/s | 1.07x |
-| Batch 16 | 450 tok/s | 680 tok/s | 1.5x |
-| Batch 32 | 500 tok/s | 850 tok/s | 1.7x |
-| GPU utilization | 65% | 88% | +23% |
+| Metric | Week 2 Baseline | Week 3 Target | Expected Strategy |
+|--------|----------------|---------------|-------------------|
+| **Queue Time %** | 85% | <50% | Increase max_num_seqs to 1024-2048 |
+| **Throughput** | 949 tok/s | 1200-1900 tok/s | Combined optimizations |
+| **Request Capacity** | 4.6 req/s | 10-15 req/s | Better concurrency |
+| **Long Seq (500+ tok)** | 4.4s P95 | <3.0s | Chunked prefill |
+| **P95 Latency** | 2.54s | <2.0s | Queue time reduction |
 
-Your results will vary by GPU model!
+**Your actual results will vary by GPU model and workload!**
+
+These targets are based on YOUR specific Week 2 measurements, not generic benchmarks.
 
 ## 🐛 Troubleshooting
 
@@ -287,14 +417,29 @@ Your results will vary by GPU model!
 
 Before moving to Week 4, ensure you have:
 
-- [ ] Run `profile_baseline.py` and viewed traces in TensorBoard
+### Core Optimizations
+- [ ] Run `run_full_optimization_suite.py` OR individual scripts below
+- [ ] ⭐ Optimized `max_num_seqs` (addresses 85% queue time bottleneck)
+- [ ] ⭐ Measured queue time improvement (target: <50%)
 - [ ] Optimized `gpu_memory_utilization` for your GPU
-- [ ] Optimized `max_num_seqs` for your workload
+- [ ] Tested chunked prefill for long sequences
+- [ ] Run `run_comprehensive_optimized_benchmark.py` with optimal settings
+
+### Analysis & Documentation
+- [ ] ⭐ Run `compare_week2_week3.py` for detailed comparison
+- [ ] ⭐ Run `visualize_optimization_results.py` for plots
+- [ ] Review all generated visualizations in `results/` folder
+- [ ] Documented optimal configuration in `OPTIMIZATION_RESULTS.md`
+
+### Validation
+- [ ] ✅ Queue time reduced from 85% (target: <50%)
+- [ ] ✅ Throughput improved (target: >1200 tok/s)
+- [ ] ✅ Long sequence P95 improved (target: <3s)
+- [ ] ✅ Overall P95 latency improved (target: <2s)
+
+### Optional
+- [ ] Run `profile_baseline.py` and viewed traces in TensorBoard
 - [ ] Analyzed PagedAttention efficiency
-- [ ] Run `run_optimized_benchmark.py` with best settings
-- [ ] Compared results with Week 2 baseline using `compare_results.py`
-- [ ] Documented your optimal configuration
-- [ ] Achieved measurable throughput improvement
 
 ## 📝 Document Your Configuration
 
